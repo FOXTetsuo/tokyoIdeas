@@ -81,7 +81,9 @@
 
         <!-- Desktop Table View -->
         <div class="hidden sm:block win95-border-inset bg-white p-4 mb-4">
-            <table class="table-fixed">
+            <table
+                class="w-full table-fixed border-separate border-spacing-y-1"
+            >
                 <thead>
                     <tr>
                         <th class="text-left w-[50%]">THREAD TITLE</th>
@@ -148,15 +150,15 @@
                             <div class="flex gap-1 justify-center">
                                 <button
                                     @click="editIdea(idea)"
-                                    class="win95-button text-xs"
+                                    class="win95-button text-xs flex-1"
                                 >
-                                    ✏️ EDIT
+                                    EDIT
                                 </button>
                                 <button
                                     @click="deleteIdea(idea.id)"
-                                    class="win95-button text-xs"
+                                    class="win95-button text-xs flex-1"
                                 >
-                                    🗑️ DELETE
+                                    DELETE
                                 </button>
                             </div>
                         </td>
