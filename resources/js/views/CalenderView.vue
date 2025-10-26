@@ -32,7 +32,17 @@
             :idea="viewingIdea"
             @close="showViewModal = false"
             @edit="editIdea(viewingIdea)"
-            @delete="deleteIdea(viewingIdea.id)"
+            @delete="
+                showConfirmDelete = true;
+                deleteId = viewingIdea.id;
+            "
+        />
+
+        <ConfirmationModal
+            v-model:visible="showConfirmDelete"
+            message="🗑️ Delete this idea? This cannot be undone!"
+            @confirm="confirmDelete($event)"
+            @cancel="showConfirmDelete = false"
         />
     </div>
 </template>
@@ -43,12 +53,14 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import IdeaModal from "../components/IdeaModal.vue";
 import IdeaViewModal from "../components/IdeaViewModal.vue";
+import ConfirmationModal from "../components/ConfirmationModal.vue";
 
 export default {
     components: {
         FullCalendar,
         IdeaModal,
         IdeaViewModal,
+        ConfirmationModal,
     },
     data() {
         return {
@@ -145,14 +157,16 @@ export default {
             this.showModal = true;
             this.showViewModal = false;
         },
-        async deleteIdea(id) {
-            await fetch(`/api/trip-ideas/${id}`, {
+        async confirmDelete(password) {
+            await fetch(`/api/trip-ideas/${this.deleteId}`, {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-Delete-Password": password,
                 },
             });
+            this.showConfirmDelete = false;
             this.showViewModal = false;
             await this.fetchIdeas();
         },

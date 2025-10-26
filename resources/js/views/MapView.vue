@@ -45,13 +45,16 @@
                 editIdea(viewingIdea);
                 showViewModal = false;
             "
-            @delete="doDelete(viewingIdea.id)"
+            @delete="
+                showConfirmDelete = true;
+                deleteId = viewingIdea.id;
+            "
         />
 
         <ConfirmationModal
             v-model:visible="showConfirmDelete"
             message="🗑️ Delete this idea? This cannot be undone!"
-            @confirm="confirmDelete"
+            @confirm="confirmDelete($event)"
             @cancel="showConfirmDelete = false"
         />
 
@@ -244,21 +247,19 @@ export default {
             this.editingIdea = idea;
             this.showModal = true;
         },
-        doDelete(id) {
-            this.showConfirmDelete = true;
-            this.deleteId = id;
-        },
-        async confirmDelete() {
-            await fetch(`/api/trip-ideas/${this.deleteId}`, {
+        confirmDelete(password) {
+            fetch(`/api/trip-ideas/${this.deleteId}`, {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-Delete-Password": password,
                 },
+            }).then(() => {
+                this.showConfirmDelete = false;
+                this.showViewModal = false;
+                this.fetchIdeas();
             });
-            this.showConfirmDelete = false;
-            this.showViewModal = false;
-            await this.fetchIdeas();
         },
     },
 };

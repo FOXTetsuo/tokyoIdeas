@@ -80,9 +80,7 @@
                 v-if="ideas.length === 0"
                 class="win95-border bg-white p-8 text-center text-gray-500"
             >
-                <div class="text-4xl mb-2">
-                    <Sprout class="w-16 h-16 text-pink-500" />
-                </div>
+                <div class="text-4xl mb-2"></div>
                 No threads yet! Start your Tokyo adventure!
             </div>
         </div>
@@ -184,9 +182,7 @@
                     </tr>
                     <tr v-if="ideas.length === 0">
                         <td colspan="5" class="text-center text-gray-500 py-8">
-                            <div class="text-4xl mb-2">
-                                <Sprout class="w-16 h-16 text-pink-500" />
-                            </div>
+                            <div class="text-4xl mb-2"></div>
                             No threads yet! Start your Tokyo adventure!
                         </td>
                     </tr>
@@ -216,13 +212,17 @@
                 editIdea(viewingIdea);
                 showViewModal = false;
             "
-            @delete="doDelete(viewingIdea.id)"
+            @delete="
+                showConfirmDelete = true;
+                deleteId = viewingIdea.id;
+                showViewModal = false;
+            "
         />
 
         <ConfirmationModal
             v-model:visible="showConfirmDelete"
             message="🗑️ Delete this idea? This cannot be undone!"
-            @confirm="confirmDelete"
+            @confirm="confirmDelete($event)"
             @cancel="showConfirmDelete = false"
         />
     </div>
@@ -327,28 +327,19 @@ export default {
             this.showConfirmDelete = true;
             this.deleteId = id;
         },
-        async confirmDelete() {
+        async confirmDelete(password) {
             await fetch(`/api/trip-ideas/${this.deleteId}`, {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-Delete-Password": password,
                 },
             });
             this.showConfirmDelete = false;
             this.fetchIdeas();
         },
-        async doDelete(id) {
-            await fetch(`/api/trip-ideas/${id}`, {
-                method: "DELETE",
-                headers: {
-                    Accept: "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            });
-            this.showViewModal = false;
-            this.fetchIdeas();
-        },
+
         closeModal() {
             this.showModal = false;
             this.editingIdea = null;

@@ -50,7 +50,7 @@
                     Edit
                 </button>
                 <button
-                    @click="confirmDelete = true"
+                    @click="$emit('delete')"
                     class="win95-button bg-red-500 text-white hover:bg-red-600"
                 >
                     Delete
@@ -58,30 +58,6 @@
                 <button @click="$emit('close')" class="win95-button">
                     Close
                 </button>
-            </div>
-        </div>
-
-        <!-- Confirmation Modal -->
-        <div
-            v-if="confirmDelete"
-            class="fixed inset-0 flex items-center justify-center z-[10001]"
-            @click.self="confirmDelete = false"
-        >
-            <div class="win95-border bg-white p-4 max-w-sm w-full mx-4">
-                <p class="mb-4 text-center">
-                    🗑️ Delete this idea? This cannot be undone!
-                </p>
-                <div class="flex gap-2 justify-center">
-                    <button
-                        @click="handleConfirmDelete"
-                        class="win95-button bg-red-500 text-white hover:bg-red-600"
-                    >
-                        Yes, Delete
-                    </button>
-                    <button @click="confirmDelete = false" class="win95-button">
-                        Cancel
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -117,7 +93,6 @@ export default {
     emits: ["close", "edit", "delete"],
     data() {
         return {
-            confirmDelete: false,
             smallMap: null,
         };
     },
@@ -129,10 +104,6 @@ export default {
         },
     },
     methods: {
-        handleConfirmDelete() {
-            this.confirmDelete = false;
-            this.$emit("delete");
-        },
         formatDate(date) {
             return new Date(date).toLocaleDateString("en-US", {
                 month: "short",

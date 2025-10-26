@@ -53,6 +53,10 @@ class TripIdeaController extends Controller
 
     public function destroy(TripIdea $tripIdea)
     {
+        if (request()->header("X-Delete-Password") !== "Trustno1") {
+            return response()->json(["error" => "Invalid password"], 403);
+        }
+
         $tripIdea->delete();
         return response()->noContent();
     }
