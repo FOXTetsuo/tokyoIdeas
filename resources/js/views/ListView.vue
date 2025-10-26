@@ -95,10 +95,10 @@
                 <thead>
                     <tr>
                         <th class="text-left w-[50%]">THREAD TITLE</th>
-                        <th class="text-center w-[15%]">DATE</th>
-                        <th class="text-center w-[15%]">LOCATION</th>
-                        <th class="text-center w-[10%]">PRICE</th>
-                        <th class="text-center w-[10%]">ACTIONS</th>
+                        <th class="text-center w-[12%]">DATE</th>
+                        <th class="text-center w-[12%]">LOCATION</th>
+                        <th class="text-center w-[8%]">PRICE</th>
+                        <th class="text-center w-[15%]">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -159,8 +159,8 @@
                             </span>
                             <span v-else class="text-gray-400">-</span>
                         </td>
-                        <td class="align-top">
-                            <div class="flex gap-1 justify-center">
+                        <td class="align-middle">
+                            <div class="flex gap-1 justify-center mr-1">
                                 <button
                                     @click="viewIdea(idea)"
                                     class="win95-button text-xs flex-1 bg-blue-500 hover:bg-blue-600 text-white"
