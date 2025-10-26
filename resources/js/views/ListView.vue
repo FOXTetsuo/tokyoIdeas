@@ -95,9 +95,12 @@
                 </thead>
                 <tbody>
                     <tr
-                        v-for="idea in ideas"
+                        v-for="(idea, index) in ideas"
                         :key="idea.id"
-                        class="hover:bg-yellow-50"
+                        :class="[
+                            'hover:bg-yellow-50',
+                            index % 2 === 0 ? 'bg-pink-50' : 'bg-purple-50',
+                        ]"
                     >
                         <td class="break-all align-top">
                             <div class="flex items-start gap-2">
@@ -136,13 +139,13 @@
                         </td>
                         <td class="text-center align-top">
                             <span v-if="idea.location_name" class="text-sm">
-                                📍 {{ idea.location_name }}
+                                {{ idea.location_name }}
                             </span>
                             <span v-else class="text-gray-400">-</span>
                         </td>
                         <td class="text-center align-top">
                             <span v-if="idea.price" class="text-sm">
-                                💴 ¥{{ formatPrice(idea.price) }}
+                                ¥{{ formatPrice(idea.price) }}
                             </span>
                             <span v-else class="text-gray-400">-</span>
                         </td>
@@ -150,13 +153,13 @@
                             <div class="flex gap-1 justify-center">
                                 <button
                                     @click="editIdea(idea)"
-                                    class="win95-button text-xs flex-1"
+                                    class="win95-button text-xs flex-1 bg-green-500 hover:bg-green-600 text-white"
                                 >
                                     EDIT
                                 </button>
                                 <button
                                     @click="deleteIdea(idea.id)"
-                                    class="win95-button text-xs flex-1"
+                                    class="win95-button text-xs flex-1 bg-red-500 hover:bg-red-600 text-white"
                                 >
                                     DELETE
                                 </button>
@@ -165,7 +168,9 @@
                     </tr>
                     <tr v-if="ideas.length === 0">
                         <td colspan="5" class="text-center text-gray-500 py-8">
-                            <div class="text-4xl mb-2">🌸</div>
+                            <div class="text-4xl mb-2">
+                                <Sprout class="w-16 h-16 text-pink-500" />
+                            </div>
                             No threads yet! Start your Tokyo adventure!
                         </td>
                     </tr>
