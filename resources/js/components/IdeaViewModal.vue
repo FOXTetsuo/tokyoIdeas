@@ -5,7 +5,7 @@
         @click.self="$emit('close')"
     >
         <div
-            class="win95-border bg-white p-4 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+            class="win95-border bg-white p-4 max-w-md md:max-w-xl w-full mx-4 max-h-[90vh] overflow-y-auto"
         >
             <h3 class="text-lg font-bold mb-4 text-forum-blue">
                 {{ idea.title }}
@@ -19,12 +19,16 @@
                 </p>
                 <p v-if="idea.location_name">
                     <strong>Location:</strong>
-                    <MapPin class="w-4 h-4 inline mr-1 text-blue-500" />
                     {{ idea.location_name }}
                 </p>
+                <div v-if="idea.latitude && idea.longitude" class="mt-2">
+                    <div
+                        id="small-map"
+                        class="h-48 w-full win95-border-inset"
+                    ></div>
+                </div>
                 <p v-if="idea.price">
                     <strong>Price:</strong>
-                    <CreditCard class="w-4 h-4 inline mr-1 text-yellow-500" />
                     ¥{{ formatPrice(idea.price) }}
                 </p>
                 <p v-if="idea.url">
@@ -43,13 +47,13 @@
                     @click="$emit('edit')"
                     class="win95-button bg-green-500 text-white hover:bg-green-600"
                 >
-                    <Edit class="w-4 h-4 inline mr-1" /> Edit
+                    Edit
                 </button>
                 <button
                     @click="confirmDelete = true"
                     class="win95-button bg-red-500 text-white hover:bg-red-600"
                 >
-                    <Trash2 class="w-4 h-4 inline mr-1" /> Delete
+                    Delete
                 </button>
                 <button @click="$emit('close')" class="win95-button">
                     Close
@@ -84,15 +88,22 @@
 </template>
 
 <script>
-import { Edit, Trash2, MapPin, CreditCard } from "lucide-vue-next";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Fix for default marker icons in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+    iconUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    shadowUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 export default {
-    components: {
-        Edit,
-        Trash2,
-        MapPin,
-        CreditCard,
-    },
+    components: {},
     props: {
         idea: {
             type: Object,
@@ -107,7 +118,15 @@ export default {
     data() {
         return {
             confirmDelete: false,
+            smallMap: null,
         };
+    },
+    watch: {
+        visible(val) {
+            if (val && this.idea.latitude && this.idea.longitude) {
+                this.$nextTick(() => this.initSmallMap());
+            }
+        },
     },
     methods: {
         handleConfirmDelete() {
@@ -123,6 +142,29 @@ export default {
         },
         formatPrice(price) {
             return Number(price).toLocaleString("ja-JP");
+        },
+        initSmallMap() {
+            if (this.smallMap) {
+                this.smallMap.remove();
+            }
+            this.smallMap = L.map("small-map").setView(
+                [this.idea.latitude, this.idea.longitude],
+                15,
+            );
+            L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+                {
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    maxZoom: 19,
+                },
+            ).addTo(this.smallMap);
+            L.marker([this.idea.latitude, this.idea.longitude]).addTo(
+                this.smallMap,
+            );
+            setTimeout(() => {
+                this.smallMap.invalidateSize();
+            }, 100);
         },
     },
 };

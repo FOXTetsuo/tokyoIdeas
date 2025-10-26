@@ -193,11 +193,6 @@
         </div>
 
         <div class="text-center text-xs sm:text-sm text-forum-dark">
-            <img
-                src="data:image/gif;base64,R0lGODlhFAAUAKIAAP///wAAAP8AAP//AAAAAAAAAAAAAAAAACwAAAAAFAAUAAADMzi63P4wyklrC0IJnj8t4bkYpFmVJIqubKu27gvH8kzX9o3n+s73/g8MCofEovGITCoBADs="
-                alt="new"
-                class="inline pixelated"
-            />
             Total cool ideas: {{ ideas.length }}
         </div>
 
