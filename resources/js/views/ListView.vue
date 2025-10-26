@@ -56,6 +56,12 @@
 
                 <div class="flex gap-1">
                     <button
+                        @click="viewIdea(idea)"
+                        class="win95-button text-xs flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                        View
+                    </button>
+                    <button
                         @click="editIdea(idea)"
                         class="win95-button text-xs flex-1"
                     >
@@ -65,7 +71,7 @@
                         @click="deleteIdea(idea.id)"
                         class="win95-button text-xs flex-1"
                     >
-                        🗑️ DELETE
+                        DELETE
                     </button>
                 </div>
             </div>
@@ -74,7 +80,9 @@
                 v-if="ideas.length === 0"
                 class="win95-border bg-white p-8 text-center text-gray-500"
             >
-                <div class="text-4xl mb-2">🌸</div>
+                <div class="text-4xl mb-2">
+                    <Sprout class="w-16 h-16 text-pink-500" />
+                </div>
                 No threads yet! Start your Tokyo adventure!
             </div>
         </div>
@@ -152,6 +160,12 @@
                         <td class="align-top">
                             <div class="flex gap-1 justify-center">
                                 <button
+                                    @click="viewIdea(idea)"
+                                    class="win95-button text-xs flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                                >
+                                    VIEW
+                                </button>
+                                <button
                                     @click="editIdea(idea)"
                                     class="win95-button text-xs flex-1 bg-green-500 hover:bg-green-600 text-white"
                                 >
@@ -196,17 +210,41 @@
             :location-required="false"
             :lat-lng-required="false"
         />
+
+        <IdeaViewModal
+            v-model:visible="showViewModal"
+            :idea="viewingIdea"
+            @close="showViewModal = false"
+            @edit="
+                editIdea(viewingIdea);
+                showViewModal = false;
+            "
+            @delete="doDelete(viewingIdea.id)"
+        />
+
+        <ConfirmationModal
+            v-model:visible="showConfirmDelete"
+            message="🗑️ Delete this idea? This cannot be undone!"
+            @confirm="confirmDelete"
+            @cancel="showConfirmDelete = false"
+        />
     </div>
 </template>
 
 <script>
 import LocationSearch from "../components/LocationSearch.vue";
 import IdeaModal from "../components/IdeaModal.vue";
+import IdeaViewModal from "../components/IdeaViewModal.vue";
+import ConfirmationModal from "../components/ConfirmationModal.vue";
+import { Sprout } from "lucide-vue-next";
 
 export default {
     components: {
         LocationSearch,
         IdeaModal,
+        IdeaViewModal,
+        ConfirmationModal,
+        Sprout,
     },
     data() {
         return {
@@ -214,6 +252,10 @@ export default {
             showModal: false,
             editingIdea: null,
             locationData: null,
+            showViewModal: false,
+            viewingIdea: null,
+            showConfirmDelete: false,
+            deleteId: null,
             emptyForm: {
                 title: "",
                 description: "",
@@ -276,23 +318,39 @@ export default {
             this.closeModal();
             this.fetchIdeas();
         },
+        viewIdea(idea) {
+            this.viewingIdea = idea;
+            this.showViewModal = true;
+        },
         editIdea(idea) {
             this.editingIdea = idea;
             this.showModal = true;
         },
-        async deleteIdea(id) {
-            if (
-                confirm("🗑️ Delete this thread? This action cannot be undone!")
-            ) {
-                await fetch(`/api/trip-ideas/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        Accept: "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                });
-                this.fetchIdeas();
-            }
+        deleteIdea(id) {
+            this.showConfirmDelete = true;
+            this.deleteId = id;
+        },
+        async confirmDelete() {
+            await fetch(`/api/trip-ideas/${this.deleteId}`, {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+            this.showConfirmDelete = false;
+            this.fetchIdeas();
+        },
+        async doDelete(id) {
+            await fetch(`/api/trip-ideas/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+            this.showViewModal = false;
+            this.fetchIdeas();
         },
         closeModal() {
             this.showModal = false;

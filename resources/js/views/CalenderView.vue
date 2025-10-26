@@ -19,12 +19,20 @@
 
         <IdeaModal
             v-model:visible="showModal"
-            :editing="false"
-            :initial-data="form"
-            @submit="saveIdea"
+            :editing="!!editingIdea"
+            :initial-data="editingIdea || form"
+            @submit="handleSubmit"
             :date-required="true"
             :location-required="false"
             :lat-lng-required="false"
+        />
+
+        <IdeaViewModal
+            v-model:visible="showViewModal"
+            :idea="viewingIdea"
+            @close="showViewModal = false"
+            @edit="editIdea(viewingIdea)"
+            @delete="deleteIdea(viewingIdea.id)"
         />
     </div>
 </template>
@@ -34,15 +42,20 @@ import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import IdeaModal from "../components/IdeaModal.vue";
+import IdeaViewModal from "../components/IdeaViewModal.vue";
 
 export default {
     components: {
         FullCalendar,
         IdeaModal,
+        IdeaViewModal,
     },
     data() {
         return {
             showModal: false,
+            editingIdea: null,
+            viewingIdea: null,
+            showViewModal: false,
             form: {
                 title: "",
                 description: "",
@@ -89,36 +102,32 @@ export default {
                 }));
         },
         handleEventClick(info) {
-            const idea = info.event.extendedProps;
-            const details = [
-                `📅 ${info.event.title}`,
-                "",
-                idea.description || "No description",
-                "",
-                idea.location_name ? `📍 ${idea.location_name}` : "",
-                idea.price
-                    ? `💴 ¥${Number(idea.price).toLocaleString("ja-JP")}`
-                    : "",
-                idea.url ? `🔗 ${idea.url}` : "",
-            ]
-                .filter((line) => line !== "")
-                .join("\n");
-
-            alert(details);
+            this.viewingIdea = info.event.extendedProps;
+            this.showViewModal = true;
         },
         handleDateClick(info) {
             this.form.date = info.dateStr;
             this.showModal = true;
         },
-        async saveIdea(formData) {
-            const response = await fetch("/api/trip-ideas", {
-                method: "POST",
+        handleSubmit(formData) {
+            this.form = formData;
+            this.saveIdea();
+        },
+        async saveIdea() {
+            const url = this.editingIdea
+                ? `/api/trip-ideas/${this.editingIdea.id}`
+                : "/api/trip-ideas";
+
+            const method = this.editingIdea ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+                method,
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(this.form),
             });
 
             if (!response.ok) {
@@ -128,11 +137,28 @@ export default {
                 return;
             }
 
-            this.showModal = false;
-            this.resetForm();
+            this.closeModal();
             await this.fetchIdeas();
         },
-        resetForm() {
+        editIdea(idea) {
+            this.editingIdea = idea;
+            this.showModal = true;
+            this.showViewModal = false;
+        },
+        async deleteIdea(id) {
+            await fetch(`/api/trip-ideas/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+            this.showViewModal = false;
+            await this.fetchIdeas();
+        },
+        closeModal() {
+            this.showModal = false;
+            this.editingIdea = null;
             this.form = {
                 title: "",
                 description: "",

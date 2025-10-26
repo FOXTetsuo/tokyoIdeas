@@ -26,8 +26,8 @@
         <!-- Modal -->
         <IdeaModal
             v-model:visible="showModal"
-            :editing="false"
-            :initial-data="form"
+            :editing="!!editingIdea"
+            :initial-data="editingIdea || form"
             @submit="saveIdea"
             :date-required="false"
             :location-required="true"
@@ -35,6 +35,24 @@
             :show-location-search="false"
             :force-show-manual-coords="true"
             :modal-z-index="'z-[10000]'"
+        />
+
+        <IdeaViewModal
+            v-model:visible="showViewModal"
+            :idea="viewingIdea"
+            @close="showViewModal = false"
+            @edit="
+                editIdea(viewingIdea);
+                showViewModal = false;
+            "
+            @delete="doDelete(viewingIdea.id)"
+        />
+
+        <ConfirmationModal
+            v-model:visible="showConfirmDelete"
+            message="🗑️ Delete this idea? This cannot be undone!"
+            @confirm="confirmDelete"
+            @cancel="showConfirmDelete = false"
         />
 
         <div class="win95-border-inset">
@@ -58,6 +76,8 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import IdeaModal from "../components/IdeaModal.vue";
+import IdeaViewModal from "../components/IdeaViewModal.vue";
+import ConfirmationModal from "../components/ConfirmationModal.vue";
 
 // Fix for default marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -73,13 +93,21 @@ L.Icon.Default.mergeOptions({
 export default {
     components: {
         IdeaModal,
+        IdeaViewModal,
+        ConfirmationModal,
     },
     data() {
         return {
             map: null,
             markers: [],
+            ideas: [],
             addingMode: false,
             showModal: false,
+            editingIdea: null,
+            showViewModal: false,
+            viewingIdea: null,
+            showConfirmDelete: false,
+            deleteId: null,
             form: {
                 title: "",
                 description: "",
@@ -95,6 +123,7 @@ export default {
     async mounted() {
         this.initMap();
         await this.fetchIdeas();
+        window.viewIdea = (id) => this.viewIdeaById(id);
     },
     methods: {
         initMap() {
@@ -126,22 +155,29 @@ export default {
         },
         async fetchIdeas() {
             const response = await fetch("/api/trip-ideas");
-            const ideas = await response.json();
+            this.ideas = await response.json();
 
             // Clear existing markers
             this.markers.forEach((marker) => marker.remove());
             this.markers = [];
 
-            ideas
+            this.ideas
                 .filter((idea) => idea.latitude && idea.longitude)
                 .forEach((idea) => {
+                    const truncatedDesc =
+                        idea.description && idea.description.length > 100
+                            ? idea.description.substring(0, 100) + "..."
+                            : idea.description || "";
                     const popupContent = `
             <div class="font-bold text-forum-blue text-sm">🎌 ${idea.title}</div>
             ${idea.location_name ? `<div class="text-xs mt-1">📍 ${idea.location_name}</div>` : ""}
-            ${idea.description ? `<div class="text-xs mt-1">${idea.description}</div>` : ""}
+            ${truncatedDesc ? `<div class="text-xs mt-1">${truncatedDesc}</div>` : ""}
             ${idea.date ? `<div class="text-xs mt-1">📅 ${new Date(idea.date).toLocaleDateString()}</div>` : ""}
             ${idea.price ? `<div class="text-xs mt-1">💴 ¥${Number(idea.price).toLocaleString("ja-JP")}</div>` : ""}
             ${idea.url ? `<div class="text-xs mt-1 truncate max-w-[200px]">🔗 <a href="${idea.url}" target="_blank" class="text-forum-blue underline">${idea.url}</a></div>` : ""}
+            <div class="mt-2">
+                <button class="win95-button text-xs bg-blue-500 text-white" onclick="window.viewIdea(${idea.id})">View</button>
+            </div>
           `;
 
                     const marker = L.marker([idea.latitude, idea.longitude])
@@ -157,8 +193,13 @@ export default {
             }
         },
         async saveIdea(formData) {
-            const response = await fetch("/api/trip-ideas", {
-                method: "POST",
+            const url = this.editingIdea
+                ? `/api/trip-ideas/${this.editingIdea.id}`
+                : "/api/trip-ideas";
+            const method = this.editingIdea ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+                method,
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
@@ -179,6 +220,7 @@ export default {
             await this.fetchIdeas();
         },
         resetForm() {
+            this.editingIdea = null;
             this.form = {
                 title: "",
                 description: "",
@@ -189,6 +231,34 @@ export default {
                 url: "",
                 price: "",
             };
+        },
+        viewIdeaById(id) {
+            const idea = this.ideas.find((i) => i.id == id);
+            if (idea) this.viewIdea(idea);
+        },
+        viewIdea(idea) {
+            this.viewingIdea = idea;
+            this.showViewModal = true;
+        },
+        editIdea(idea) {
+            this.editingIdea = idea;
+            this.showModal = true;
+        },
+        doDelete(id) {
+            this.showConfirmDelete = true;
+            this.deleteId = id;
+        },
+        async confirmDelete() {
+            await fetch(`/api/trip-ideas/${this.deleteId}`, {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+            this.showConfirmDelete = false;
+            this.showViewModal = false;
+            await this.fetchIdeas();
         },
     },
 };
