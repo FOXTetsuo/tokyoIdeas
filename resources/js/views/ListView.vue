@@ -181,10 +181,7 @@
                 alt="new"
                 class="inline pixelated"
             />
-            Total Threads: {{ ideas.length }} | Members Online:
-            <span class="text-lime-600 font-bold">{{
-                Math.floor(Math.random() * 20) + 5
-            }}</span>
+            Total cool ideas: {{ ideas.length }}
         </div>
 
         <IdeaModal

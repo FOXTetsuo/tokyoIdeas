@@ -1,7 +1,7 @@
 <template>
     <div class="win95-border bg-forum-bg p-2 sm:p-4">
         <h2 class="text-xl sm:text-2xl font-bold text-forum-blue mb-4">
-            <span class="animate-pulse">►</span> TRIP CALENDAR
+            <span class="animate-pulse">►</span> Cool events on specific dates!
         </h2>
 
         <div class="win95-border-inset bg-white p-2 sm:p-4">

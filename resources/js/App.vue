@@ -98,13 +98,6 @@
                         class="pixelated hidden sm:block"
                     />
                 </div>
-                <div class="text-center mt-2 text-xs text-forum-dark">
-                    Visitor Counter:
-                    <span
-                        class="bg-black text-lime-400 px-2 py-1 font-mono text-xs"
-                        >{{ visitorCount }}</span
-                    >
-                </div>
             </div>
         </div>
     </div>
