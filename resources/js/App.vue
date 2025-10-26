@@ -1,16 +1,24 @@
 <template>
     <div
-        class="min-h-screen bg-gradient-to-br from-teal-400 via-purple-500 to-pink-500 py-4 px-2 sm:py-8 sm:px-4"
+        class="min-h-screen py-4 px-2 sm:py-8 sm:px-4"
+        style="
+            background-image: url(&quot;/images/background038.gif&quot;);
+            background-repeat: repeat;
+        "
     >
         <!-- Animated background pattern -->
         <!-- 4:3 Container -->
-        <div class="relative z-10 mx-auto max-w-7xl">
+        <div class="relative z-10 mx-auto max-w-7xl bg-white">
             <div class="win95-border bg-forum-bg p-1">
                 <div
                     class="bg-gradient-to-r from-blue-800 to-blue-600 px-2 sm:px-3 py-2 flex items-center justify-between"
                 >
                     <div class="flex items-center gap-1 sm:gap-2">
-                        <span class="text-xl sm:text-2xl">🗾</span>
+                        <img
+                            src="/images/Japan.gif"
+                            alt="Japan"
+                            class="w-6 h-6 sm:w-8 sm:h-8"
+                        />
                         <h1
                             class="text-white font-bold text-xs sm:text-xl tracking-wider"
                         >
@@ -69,12 +77,12 @@
             </div>
 
             <!-- Main Content -->
-            <div class="mt-2 sm:mt-4">
+            <div class="mt-0">
                 <router-view />
             </div>
 
             <!-- Footer -->
-            <div class="win95-border bg-forum-bg mt-2 sm:mt-4 p-2 sm:p-4">
+            <div class="win95-border bg-forum-bg mt-0 p-2 sm:p-4">
                 <div
                     class="flex items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm"
                 >
