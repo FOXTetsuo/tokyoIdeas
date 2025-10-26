@@ -17,160 +17,15 @@
             Click on events to see details! Click on a date to add new idea!
         </div>
 
-        <!-- Modal -->
-        <div
-            v-if="showModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4 overflow-y-auto"
-        >
-            <div class="win95-border bg-forum-bg p-1 max-w-2xl w-full my-4">
-                <div
-                    class="bg-gradient-to-r from-blue-800 to-blue-600 px-3 py-1 flex justify-between items-center mb-1"
-                >
-                    <span class="text-white font-bold text-xs sm:text-sm">
-                        ➕ NEW THREAD
-                    </span>
-                    <button
-                        @click="closeModal"
-                        class="text-white hover:bg-blue-700 px-2 text-xl leading-none"
-                    >
-                        ×
-                    </button>
-                </div>
-
-                <div
-                    class="win95-border-inset bg-white p-3 sm:p-4 max-h-[80vh] overflow-y-auto"
-                >
-                    <form @submit.prevent="saveIdea" class="space-y-3">
-                        <div>
-                            <label
-                                class="block text-xs sm:text-sm font-bold mb-1"
-                                >THREAD TITLE *</label
-                            >
-                            <input
-                                v-model="form.title"
-                                placeholder="Enter thread title..."
-                                required
-                                class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label
-                                class="block text-xs sm:text-sm font-bold mb-1"
-                                >MESSAGE</label
-                            >
-                            <textarea
-                                v-model="form.description"
-                                placeholder="Share your Tokyo trip idea..."
-                                rows="4"
-                                class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                            ></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label
-                                    class="block text-xs sm:text-sm font-bold mb-1"
-                                    >📅 DATE *</label
-                                >
-                                <input
-                                    v-model="form.date"
-                                    type="date"
-                                    required
-                                    class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block text-xs sm:text-sm font-bold mb-1"
-                                    >💴 PRICE ¥ (optional)</label
-                                >
-                                <input
-                                    v-model="form.price"
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    placeholder="5000"
-                                    class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label
-                                class="block text-xs sm:text-sm font-bold mb-1"
-                                >🔗 URL (optional)</label
-                            >
-                            <input
-                                v-model="form.url"
-                                type="url"
-                                placeholder="https://example.com"
-                                class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label
-                                class="block text-xs sm:text-sm font-bold mb-1"
-                                >📍 LOCATION NAME (optional)</label
-                            >
-                            <input
-                                v-model="form.location_name"
-                                placeholder="e.g., Shibuya Crossing"
-                                class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-blue-500"
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label
-                                    class="block text-xs sm:text-sm font-bold mb-1"
-                                    >🗺️ LATITUDE (optional)</label
-                                >
-                                <input
-                                    v-model="form.latitude"
-                                    type="number"
-                                    step="0.00000001"
-                                    placeholder="35.6762"
-                                    class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block text-xs sm:text-sm font-bold mb-1"
-                                    >🗺️ LONGITUDE (optional)</label
-                                >
-                                <input
-                                    v-model="form.longitude"
-                                    type="number"
-                                    step="0.00000001"
-                                    placeholder="139.6503"
-                                    class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2 justify-end pt-2">
-                            <button
-                                type="button"
-                                @click="closeModal"
-                                class="win95-button text-xs sm:text-sm"
-                            >
-                                ❌ CANCEL
-                            </button>
-                            <button
-                                type="submit"
-                                class="win95-button text-xs sm:text-sm"
-                            >
-                                💾 POST
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <IdeaModal
+            v-model:visible="showModal"
+            :editing="false"
+            :initial-data="form"
+            @submit="saveIdea"
+            :date-required="true"
+            :location-required="false"
+            :lat-lng-required="false"
+        />
     </div>
 </template>
 
@@ -178,10 +33,12 @@
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import IdeaModal from "../components/IdeaModal.vue";
 
 export default {
     components: {
         FullCalendar,
+        IdeaModal,
     },
     data() {
         return {
@@ -253,7 +110,7 @@ export default {
             this.form.date = info.dateStr;
             this.showModal = true;
         },
-        async saveIdea() {
+        async saveIdea(formData) {
             const response = await fetch("/api/trip-ideas", {
                 method: "POST",
                 headers: {
@@ -261,7 +118,7 @@ export default {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                body: JSON.stringify(this.form),
+                body: JSON.stringify(formData),
             });
 
             if (!response.ok) {
@@ -271,11 +128,11 @@ export default {
                 return;
             }
 
-            this.closeModal();
+            this.showModal = false;
+            this.resetForm();
             await this.fetchIdeas();
         },
-        closeModal() {
-            this.showModal = false;
+        resetForm() {
             this.form = {
                 title: "",
                 description: "",
