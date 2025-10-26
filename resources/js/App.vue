@@ -78,25 +78,12 @@
                 <div
                     class="flex items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm"
                 >
-                    <img
-                        src="data:image/gif;base64,R0lGODlhEAAQAMQAAAAAAP///wAAAP8AAP//AP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgAEACwAAAAAEAAQAAAFPSAgjmRpnmiqrmzrvnAsz3Rt33iu73zv/8CgcEgsGo/IpHLJbDqf0Kh0Sq1ar9isdsvter/gsHhMLpvPCAA7"
-                        alt="construction"
-                        class="pixelated hidden sm:block"
-                    />
                     <marquee
                         behavior="scroll"
                         class="text-forum-blue font-bold flex-1"
                     >
-                        ✨ Welcome to Tokyo Trip Ideas! Est. 2025 ✨
-                        <span class="hidden sm:inline"
-                            >Best viewed in Netscape Navigator ✨</span
-                        >
+                        *** Welcome to Tokyo Trip Ideas! Est. 2025 ***
                     </marquee>
-                    <img
-                        src="data:image/gif;base64,R0lGODlhEAAQAMQAAAAAAP///wAAAP8AAP//AP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgAEACwAAAAAEAAQAAAFPSAgjmRpnmiqrmzrvnAsz3Rt33iu73zv/8CgcEgsGo/IpHLJbDqf0Kh0Sq1ar9isdsvter/gsHhMLpvPCAA7"
-                        alt="construction"
-                        class="pixelated hidden sm:block"
-                    />
                 </div>
             </div>
         </div>
