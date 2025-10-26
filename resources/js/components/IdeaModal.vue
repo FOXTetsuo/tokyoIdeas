@@ -120,7 +120,7 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
                             <div>
                                 <label
                                     class="block text-xs sm:text-sm font-bold mb-1"
-                                    >📍 LOCATION NAME
+                                    >LOCATION NAME
                                     {{ locationRequired ? "*" : "" }}</label
                                 >
                                 <input

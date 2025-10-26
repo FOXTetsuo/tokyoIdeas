@@ -10,7 +10,7 @@
                 @click="openNewModal"
                 class="win95-button text-sm sm:text-base w-full sm:w-auto"
             >
-                ➕ NEW THREAD
+                New Thread
             </button>
         </div>
 
@@ -60,7 +60,7 @@
                         @click="editIdea(idea)"
                         class="win95-button text-xs flex-1"
                     >
-                        ✏️ EDIT
+                        Edit
                     </button>
                     <button
                         @click="deleteIdea(idea.id)"
@@ -310,7 +310,7 @@ export default {
         getEmoji(idea) {
             if (idea.location_name && idea.date) return "🎌";
             if (idea.date) return "📅";
-            if (idea.location_name) return "📍";
+            if (idea.location_name) return "🧠";
             return "💡";
         },
     },

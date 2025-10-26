@@ -1,4 +1,13 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+@font-face {
+    font-family: "W95FA";
+    src:
+        url("../fonts/w95fa.woff2") format("woff2"),
+        url("../fonts/w95fa.woff") format("woff"),
+        url("../fonts/W95FA.otf") format("opentype");
+    font-display: swap;
+}
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,6 +15,50 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans:
+        "W95FA", "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+}
+
+.win95-button {
+    border-style: solid;
+    border-width: 2px;
+    border-top-color: #ffffff;
+    border-left-color: #ffffff;
+    border-right-color: #000000;
+    border-bottom-color: #000000;
+    background: #c0c0c0;
+    box-shadow: 2px 2px 0px #000000;
+    cursor: pointer;
+    color: #000000;
+    padding: 2px 6px;
+    display: inline-block;
+    text-align: center;
+}
+
+.win95-button:active {
+    border-top-color: #000000;
+    border-left-color: #000000;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    box-shadow: inset 2px 2px 0px #000000;
+}
+
+.win95-border {
+    border-style: solid;
+    border-width: 2px;
+    border-top-color: #ffffff;
+    border-left-color: #ffffff;
+    border-right-color: #000000;
+    border-bottom-color: #000000;
+}
+
+.win95-border-inset {
+    border-style: solid;
+    border-width: 2px;
+    border-top-color: #000000;
+    border-left-color: #000000;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
 }

@@ -35,8 +35,8 @@
                             class="win95-button text-xs sm:text-sm"
                         >
                             📋
-                            <span class="hidden sm:inline">MESSAGE BOARD</span
-                            ><span class="sm:hidden">LIST</span>
+                            <span class="hidden sm:inline">Forum</span
+                            ><span class="sm:hidden">Forum</span>
                         </button>
                     </router-link>
                     <router-link
@@ -49,7 +49,7 @@
                             :class="{ 'win95-border-inset': isActive }"
                             class="win95-button text-xs sm:text-sm"
                         >
-                            📅 CALENDAR
+                            📅 Calendar
                         </button>
                     </router-link>
                     <router-link
@@ -62,7 +62,7 @@
                             :class="{ 'win95-border-inset': isActive }"
                             class="win95-button text-xs sm:text-sm"
                         >
-                            🗺️ MAP
+                            🗺️ Map
                         </button>
                     </router-link>
                 </div>

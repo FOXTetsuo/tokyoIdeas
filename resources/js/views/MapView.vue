@@ -4,14 +4,14 @@
             class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4"
         >
             <h2 class="text-xl sm:text-2xl font-bold text-forum-blue">
-                <span class="animate-pulse">►</span> LOCATION MAP
+                <span class="animate-pulse">►</span> Location map
             </h2>
             <button
                 @click="addingMode = !addingMode"
                 :class="{ 'win95-border-inset': addingMode }"
                 class="win95-button text-sm sm:text-base w-full sm:w-auto"
             >
-                {{ addingMode ? "❌ CANCEL" : "➕ ADD LOCATION" }}
+                {{ addingMode ? "Cancel" : "Add a new idea!" }}
             </button>
         </div>
 
