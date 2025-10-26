@@ -22,7 +22,6 @@
                 class="win95-border bg-white p-3"
             >
                 <div class="flex items-start gap-2 mb-2">
-                    <span class="text-2xl">{{ getEmoji(idea) }}</span>
                     <div class="flex-1 min-w-0">
                         <div class="font-bold text-forum-blue break-words">
                             {{ idea.title }}
@@ -81,17 +80,15 @@
         </div>
 
         <!-- Desktop Table View -->
-        <div
-            class="hidden sm:block win95-border-inset bg-white p-4 mb-4 overflow-x-auto"
-        >
-            <table class="forum-table">
+        <div class="hidden sm:block win95-border-inset bg-white p-4 mb-4">
+            <table class="table-fixed">
                 <thead>
                     <tr>
-                        <th class="text-left">THREAD TITLE</th>
-                        <th class="w-24">DATE</th>
-                        <th class="w-32">LOCATION</th>
-                        <th class="w-24">PRICE</th>
-                        <th class="w-40">ACTIONS</th>
+                        <th class="text-left w-[50%]">THREAD TITLE</th>
+                        <th class="text-center w-[15%]">DATE</th>
+                        <th class="text-center w-[15%]">LOCATION</th>
+                        <th class="text-center w-[10%]">PRICE</th>
+                        <th class="text-center w-[10%]">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,18 +97,17 @@
                         :key="idea.id"
                         class="hover:bg-yellow-50"
                     >
-                        <td>
+                        <td class="break-all align-top">
                             <div class="flex items-start gap-2">
-                                <span class="text-2xl">{{
-                                    getEmoji(idea)
-                                }}</span>
                                 <div class="min-w-0">
-                                    <div class="font-bold text-forum-blue">
+                                    <div
+                                        class="font-bold text-forum-blue break-all"
+                                    >
                                         {{ idea.title }}
                                     </div>
                                     <div
                                         v-if="idea.description"
-                                        class="text-sm text-gray-600 mt-1"
+                                        class="text-sm text-gray-600 mt-1 break-all"
                                     >
                                         {{ idea.description }}
                                     </div>
@@ -130,25 +126,25 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center align-top">
                             <span v-if="idea.date" class="text-sm">
                                 {{ formatDate(idea.date) }}
                             </span>
                             <span v-else class="text-gray-400">-</span>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center align-top">
                             <span v-if="idea.location_name" class="text-sm">
                                 📍 {{ idea.location_name }}
                             </span>
                             <span v-else class="text-gray-400">-</span>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center align-top">
                             <span v-if="idea.price" class="text-sm">
                                 💴 ¥{{ formatPrice(idea.price) }}
                             </span>
                             <span v-else class="text-gray-400">-</span>
                         </td>
-                        <td>
+                        <td class="align-top">
                             <div class="flex gap-1 justify-center">
                                 <button
                                     @click="editIdea(idea)"
@@ -306,12 +302,6 @@ export default {
         },
         formatPrice(price) {
             return Number(price).toLocaleString("ja-JP");
-        },
-        getEmoji(idea) {
-            if (idea.location_name && idea.date) return "🎌";
-            if (idea.date) return "📅";
-            if (idea.location_name) return "🧠";
-            return "💡";
         },
     },
 };
