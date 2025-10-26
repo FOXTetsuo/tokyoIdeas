@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="visible"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        class="fixed inset-0 flex items-center justify-center z-50"
         @click.self="$emit('cancel')"
     >
         <div class="win95-border bg-white p-4 max-w-sm w-full mx-4">

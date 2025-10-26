@@ -3,7 +3,7 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
     <div
         v-if="visible"
         :class="[
-            'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto',
+            'fixed inset-0  flex items-center justify-center p-2 sm:p-4 overflow-y-auto',
             modalZIndex,
         ]"
     >
