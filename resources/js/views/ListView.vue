@@ -30,7 +30,7 @@
                             v-if="idea.description"
                             class="text-sm text-gray-600 mt-1 break-words"
                         >
-                            {{ idea.description }}
+                            {{ formatDescription(idea.description) }}
                         </div>
                     </div>
                 </div>
@@ -122,7 +122,9 @@
                                         v-if="idea.description"
                                         class="text-sm text-gray-600 mt-1 break-all"
                                     >
-                                        {{ idea.description }}
+                                        {{
+                                            formatDescription(idea.description)
+                                        }}
                                     </div>
                                     <div
                                         v-if="idea.url"
@@ -362,6 +364,12 @@ export default {
         },
         formatPrice(price) {
             return Number(price).toLocaleString("ja-JP");
+        },
+        formatDescription(description) {
+            if (!description) return "";
+            return description.length > 200
+                ? description.substring(0, 200) + "..."
+                : description;
         },
     },
 };
