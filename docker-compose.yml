@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: fomks/tokyo-trip-planner:latest
     container_name: tokyo-trip-planner
     ports:
       - "8000:8000"
