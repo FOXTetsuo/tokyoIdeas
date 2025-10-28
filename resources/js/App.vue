@@ -2,7 +2,7 @@
     <div
         class="min-h-screen py-4 px-2 sm:py-8 sm:px-4"
         style="
-            background-image: url(&quot;/images/bubbles.gif&quot;);
+            background-image: url(&quot;/images/blobz.gif&quot;);
             background-repeat: repeat;
         "
     >
