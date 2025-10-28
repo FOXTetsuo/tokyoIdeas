@@ -20,6 +20,7 @@ services:
       - DB_USERNAME=tokyo_user
       - DB_PASSWORD=tokyo_password
       - DB_CONNECTION=mysql
+      - APP_URL=https://japan.fomks.nl
 
   db:
     image: mysql:8.0
