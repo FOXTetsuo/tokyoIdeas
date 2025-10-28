@@ -4,8 +4,14 @@ services:
     container_name: tokyo-trip-planner
     ports:
       - "8000:8000"
+    # Bind the project into the container for live editing, but keep
+    # vendor and built assets in named volumes so the image build output
+    # isn't hidden by the host mount.
     volumes:
       - .:/var/www/html
+      - vendor_data:/var/www/html/vendor
+      - build_data:/var/www/html/public/build
+    entrypoint: ["/bin/sh", "/var/www/html/docker/app-entrypoint.sh"]
     depends_on:
       - db
     environment:
@@ -29,3 +35,5 @@ services:
 
 volumes:
   db_data:
+  vendor_data:
+  build_data:
