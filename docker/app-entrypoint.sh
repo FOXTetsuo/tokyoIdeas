@@ -37,5 +37,14 @@ fi
 chown -R www-data:www-data storage bootstrap/cache || true
 chmod -R 775 storage bootstrap/cache || true
 
+# Wait for MySQL to be ready
+until nc -z db 3306; do
+  echo "Waiting for MySQL to be ready..."
+  sleep 1
+done
+
+# Run database migrations
+php artisan migrate --force || true
+
 # Exec supervisord as in the Dockerfile
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
