@@ -193,13 +193,13 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
                             @click="close"
                             class="win95-button text-xs sm:text-sm"
                         >
-                            ❌ CANCEL
+                            CANCEL
                         </button>
                         <button
                             type="submit"
                             class="win95-button text-xs sm:text-sm"
                         >
-                            💾 {{ editing ? "UPDATE" : "POST" }}
+                            {{ editing ? "UPDATE" : "POST" }}
                         </button>
                     </div>
                 </form>
@@ -308,8 +308,12 @@ export default {
         handleLocationUpdate(data) {
             if (data) {
                 this.form.location_name = data.location_name;
-                this.form.latitude = data.latitude;
-                this.form.longitude = data.longitude;
+                this.form.latitude = data.latitude
+                    ? parseFloat(data.latitude)
+                    : "";
+                this.form.longitude = data.longitude
+                    ? parseFloat(data.longitude)
+                    : "";
             }
         },
         submit() {

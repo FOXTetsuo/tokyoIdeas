@@ -3,10 +3,10 @@
         <button
             type="button"
             @click="toggleDropdown"
-            class="win95-button text-sm w-full sm:w-auto flex items-center justify-between gap-2 min-w-[150px]"
+            class="win95-button w-full sm:w-auto flex items-center justify-between gap-2 min-w-[150px]"
         >
             <span>{{ selectedLabel }}</span>
-            <span class="text-xs">{{ isOpen ? '▲' : '▼' }}</span>
+            <span class="text-xs">{{ isOpen ? "▲" : "▼" }}</span>
         </button>
 
         <div
@@ -19,7 +19,7 @@
                 @click="selectOption(option)"
                 :class="[
                     'px-3 py-2 cursor-pointer text-sm hover:bg-blue-500 hover:text-white',
-                    modelValue === option.value ? 'bg-blue-100' : ''
+                    modelValue === option.value ? 'bg-blue-100' : '',
                 ]"
             >
                 {{ option.label }}
@@ -30,48 +30,55 @@
 
 <script>
 export default {
-    name: 'CategoryDropdown',
+    name: "CategoryDropdown",
     props: {
         modelValue: {
             type: String,
-            default: ''
+            default: "",
         },
         options: {
             type: Array,
-            required: true
-        }
+            required: true,
+        },
     },
-    emits: ['update:modelValue'],
+    emits: ["update:modelValue"],
     data() {
         return {
-            isOpen: false
+            isOpen: false,
         };
     },
     computed: {
         selectedLabel() {
-            const selected = this.options.find(opt => opt.value === this.modelValue);
-            return selected ? selected.label : this.options[0]?.label || 'Select';
-        }
+            const selected = this.options.find(
+                (opt) => opt.value === this.modelValue,
+            );
+            return selected
+                ? selected.label
+                : this.options[0]?.label || "Select";
+        },
     },
     mounted() {
-        document.addEventListener('click', this.handleClickOutside);
+        document.addEventListener("click", this.handleClickOutside);
     },
     beforeUnmount() {
-        document.removeEventListener('click', this.handleClickOutside);
+        document.removeEventListener("click", this.handleClickOutside);
     },
     methods: {
         toggleDropdown() {
             this.isOpen = !this.isOpen;
         },
         selectOption(option) {
-            this.$emit('update:modelValue', option.value);
+            this.$emit("update:modelValue", option.value);
             this.isOpen = false;
         },
         handleClickOutside(event) {
-            if (this.$refs.dropdown && !this.$refs.dropdown.contains(event.target)) {
+            if (
+                this.$refs.dropdown &&
+                !this.$refs.dropdown.contains(event.target)
+            ) {
                 this.isOpen = false;
             }
-        }
-    }
+        },
+    },
 };
 </script>

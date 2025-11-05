@@ -10,6 +10,7 @@
                 <CategoryDropdown
                     v-model="selectedCategory"
                     :options="categoryOptions"
+                    class="text-sm sm:text-base"
                 />
                 <button
                     @click="openNewModal"
@@ -23,9 +24,12 @@
         <!-- Mobile Card View -->
         <div class="sm:hidden space-y-2">
             <div
-                v-for="idea in filteredIdeas"
+                v-for="(idea, index) in filteredIdeas"
                 :key="idea.id"
-                class="win95-border bg-white p-3"
+                :class="[
+                    'win95-border p-3',
+                    index % 2 === 0 ? 'bg-blue-50' : 'bg-cyan-50',
+                ]"
             >
                 <div class="flex items-start gap-2 mb-2">
                     <div class="flex-1 min-w-0">
@@ -43,7 +47,7 @@
 
                 <div class="text-xs text-gray-600 space-y-1 mb-2">
                     <div v-if="idea.category">
-                        {{ getCategoryIcon(idea.category) }} {{ idea.category }}
+                        {{ idea.category }}
                     </div>
                     <div v-if="idea.date">📅 {{ formatDate(idea.date) }}</div>
                     <div v-if="idea.location_name">
@@ -89,7 +93,6 @@
                 v-if="filteredIdeas.length === 0"
                 class="win95-border bg-white p-8 text-center text-gray-500"
             >
-                <div class="text-4xl mb-2">🔍</div>
                 {{
                     selectedCategory
                         ? "No threads in this category!"
@@ -99,18 +102,23 @@
         </div>
 
         <!-- Desktop Table View -->
-        <div class="hidden sm:block win95-border-inset bg-white p-4 mb-4">
+        <div
+            class="hidden sm:block win95-border-inset bg-white p-4 mb-4 overflow-x-auto"
+        >
             <table
-                class="w-full table-fixed border-separate border-spacing-y-1"
+                class="w-full border-separate border-spacing-y-1"
+                style="min-width: 800px"
             >
                 <thead>
                     <tr>
-                        <th class="text-left w-[40%]">THREAD TITLE</th>
-                        <th class="text-center w-[10%]">CATEGORY</th>
-                        <th class="text-center w-[10%]">DATE</th>
-                        <th class="text-center w-[12%]">LOCATION</th>
-                        <th class="text-center w-[8%]">PRICE</th>
-                        <th class="text-center w-[15%]">ACTIONS</th>
+                        <th class="text-left" style="width: 35%">
+                            THREAD TITLE
+                        </th>
+                        <th class="text-center" style="width: 10%">CATEGORY</th>
+                        <th class="text-center" style="width: 12%">DATE</th>
+                        <th class="text-center" style="width: 13%">LOCATION</th>
+                        <th class="text-center" style="width: 10%">PRICE</th>
+                        <th class="text-center" style="width: 20%">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -155,9 +163,7 @@
                         </td>
                         <td class="text-center align-top">
                             <span v-if="idea.category" class="text-sm">
-                                {{ getCategoryIcon(idea.category) }}<br />{{
-                                    idea.category
-                                }}
+                                {{ idea.category }}
                             </span>
                             <span v-else class="text-gray-400">-</span>
                         </td>
@@ -204,7 +210,6 @@
                     </tr>
                     <tr v-if="filteredIdeas.length === 0">
                         <td colspan="6" class="text-center text-gray-500 py-8">
-                            <div class="text-4xl mb-2">🔍</div>
                             {{
                                 selectedCategory
                                     ? "No threads in this category!"
@@ -287,15 +292,15 @@ export default {
             deleteId: null,
             selectedCategory: "",
             categoryOptions: [
-                { value: "", label: "🔍 All Categories" },
-                { value: "Museum", label: "🏛️ Museum" },
-                { value: "Trip", label: "🚆 Trip" },
-                { value: "Weird", label: "👽 Weird" },
-                { value: "Activity", label: "⚡ Activity" },
-                { value: "Shop", label: "🛍️ Shop" },
-                { value: "Sight", label: "🗼 Sight" },
-                { value: "Food", label: "🍜 Food" },
-                { value: "Drinks", label: "🍺 Drinks" },
+                { value: "", label: "All Categories" },
+                { value: "Museum", label: "Museum" },
+                { value: "Trip", label: "Trip" },
+                { value: "Weird", label: "Weird" },
+                { value: "Activity", label: "Activity" },
+                { value: "Shop", label: "Shop" },
+                { value: "Sight", label: "Sight" },
+                { value: "Food", label: "Food" },
+                { value: "Drinks", label: "Drinks" },
             ],
             emptyForm: {
                 title: "",
@@ -416,19 +421,6 @@ export default {
             return description.length > 200
                 ? description.substring(0, 200) + "..."
                 : description;
-        },
-        getCategoryIcon(category) {
-            const icons = {
-                Museum: "🏛️",
-                Trip: "🚆",
-                Weird: "👽",
-                Activity: "⚡",
-                Shop: "🛍️",
-                Sight: "🗼",
-                Food: "🍜",
-                Drinks: "🍺",
-            };
-            return icons[category] || "📌";
         },
     },
 };

@@ -16,7 +16,7 @@
                 </p>
                 <p v-if="idea.category">
                     <strong>Category:</strong>
-                    {{ getCategoryIcon(idea.category) }} {{ idea.category }}
+                    {{ idea.category }}
                 </p>
                 <p v-if="idea.date">
                     <strong>Date:</strong> {{ formatDate(idea.date) }}
@@ -118,19 +118,7 @@ export default {
         formatPrice(price) {
             return Number(price).toLocaleString("ja-JP");
         },
-        getCategoryIcon(category) {
-            const icons = {
-                Museum: "🏛️",
-                Trip: "🚆",
-                Weird: "👽",
-                Activity: "⚡",
-                Shop: "🛍️",
-                Sight: "🗼",
-                Food: "🍜",
-                Drinks: "🍺",
-            };
-            return icons[category] || "📌";
-        },
+
         initSmallMap() {
             if (this.smallMap) {
                 this.smallMap.remove();

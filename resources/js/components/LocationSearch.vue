@@ -64,14 +64,7 @@
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <div class="font-bold">
-                        ✅ Selected: {{ selectedLocation.name }}
-                    </div>
-                    <div class="text-gray-600 mt-1">
-                        📍 {{ selectedLocation.display_name }}
-                    </div>
-                    <div class="text-gray-600 mt-1">
-                        🗺️ {{ Number(selectedLocation.lat).toFixed(6) }},
-                        {{ Number(selectedLocation.lon).toFixed(6) }}
+                        Selected: {{ selectedLocation.name }}
                     </div>
                 </div>
                 <button
@@ -96,20 +89,43 @@ export default {
     },
     emits: ["update:modelValue"],
     data() {
+        const selectedLocation = this.modelValue
+            ? {
+                  name: this.modelValue.name || this.modelValue.location_name,
+                  display_name:
+                      this.modelValue.display_name ||
+                      this.modelValue.location_name,
+                  lat: this.modelValue.lat || this.modelValue.latitude,
+                  lon: this.modelValue.lon || this.modelValue.longitude,
+              }
+            : null;
+
         return {
-            searchQuery: "",
+            searchQuery: this.modelValue
+                ? this.modelValue.name || this.modelValue.location_name || ""
+                : "",
             results: [],
             loading: false,
             showResults: false,
-            selectedLocation: this.modelValue,
+            selectedLocation: selectedLocation,
             debounceTimer: null,
         };
     },
     watch: {
         modelValue(newVal) {
-            this.selectedLocation = newVal;
-            if (newVal && newVal.name) {
-                this.searchQuery = newVal.name;
+            if (newVal) {
+                // Handle both formats: internal (lat/lon) and external (latitude/longitude)
+                this.selectedLocation = {
+                    name: newVal.name || newVal.location_name,
+                    display_name: newVal.display_name || newVal.location_name,
+                    lat: newVal.lat || newVal.latitude,
+                    lon: newVal.lon || newVal.longitude,
+                };
+                if (newVal.name || newVal.location_name) {
+                    this.searchQuery = newVal.name || newVal.location_name;
+                }
+            } else {
+                this.selectedLocation = null;
             }
         },
     },
