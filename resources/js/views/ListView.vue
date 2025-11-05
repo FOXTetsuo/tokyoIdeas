@@ -81,7 +81,7 @@
                 class="win95-border bg-white p-8 text-center text-gray-500"
             >
                 <div class="text-4xl mb-2"></div>
-                No threads yet! Start your Tokyo adventure!
+                No threads yet!
             </div>
         </div>
 
@@ -105,7 +105,7 @@
                         :key="idea.id"
                         :class="[
                             'hover:bg-yellow-50',
-                            index % 2 === 0 ? 'bg-pink-50' : 'bg-purple-50',
+                            index % 2 === 0 ? 'bg-blue-50' : 'bg-cyan-50',
                         ]"
                     >
                         <td class="break-all align-top">
@@ -183,7 +183,7 @@
                     <tr v-if="ideas.length === 0">
                         <td colspan="5" class="text-center text-gray-500 py-8">
                             <div class="text-4xl mb-2"></div>
-                            No threads yet! Start your Tokyo adventure!
+                            No threads yet!
                         </td>
                     </tr>
                 </tbody>
