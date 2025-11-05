@@ -51,6 +51,26 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
                         ></textarea>
                     </div>
 
+                    <div>
+                        <label class="block text-xs sm:text-sm font-bold mb-1"
+                            >CATEGORY (optional)</label
+                        >
+                        <select
+                            v-model="form.category"
+                            class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">-- Select Category --</option>
+                            <option value="Museum">Museum</option>
+                            <option value="Trip">Trip</option>
+                            <option value="Weird">Weird</option>
+                            <option value="Activity">Activity</option>
+                            <option value="Shop">Shop</option>
+                            <option value="Sight">Sight</option>
+                            <option value="Food">Food</option>
+                            <option value="Drinks">Drinks</option>
+                        </select>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label
@@ -216,6 +236,7 @@ export default {
                 longitude: "",
                 url: "",
                 price: "",
+                category: "",
             }),
         },
         dateRequired: {

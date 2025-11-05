@@ -6,18 +6,24 @@
             <h2 class="text-xl sm:text-2xl font-bold text-forum-blue">
                 <span class="animate-pulse">►</span> All Threads
             </h2>
-            <button
-                @click="openNewModal"
-                class="win95-button text-sm sm:text-base w-full sm:w-auto"
-            >
-                New Thread
-            </button>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <CategoryDropdown
+                    v-model="selectedCategory"
+                    :options="categoryOptions"
+                />
+                <button
+                    @click="openNewModal"
+                    class="win95-button text-sm sm:text-base w-full sm:w-auto"
+                >
+                    New Thread
+                </button>
+            </div>
         </div>
 
         <!-- Mobile Card View -->
         <div class="sm:hidden space-y-2">
             <div
-                v-for="idea in ideas"
+                v-for="idea in filteredIdeas"
                 :key="idea.id"
                 class="win95-border bg-white p-3"
             >
@@ -36,6 +42,9 @@
                 </div>
 
                 <div class="text-xs text-gray-600 space-y-1 mb-2">
+                    <div v-if="idea.category">
+                        {{ getCategoryIcon(idea.category) }} {{ idea.category }}
+                    </div>
                     <div v-if="idea.date">📅 {{ formatDate(idea.date) }}</div>
                     <div v-if="idea.location_name">
                         📍 {{ idea.location_name }}
@@ -77,11 +86,15 @@
             </div>
 
             <div
-                v-if="ideas.length === 0"
+                v-if="filteredIdeas.length === 0"
                 class="win95-border bg-white p-8 text-center text-gray-500"
             >
-                <div class="text-4xl mb-2"></div>
-                No threads yet!
+                <div class="text-4xl mb-2">🔍</div>
+                {{
+                    selectedCategory
+                        ? "No threads in this category!"
+                        : "No threads yet! Start your Tokyo adventure!"
+                }}
             </div>
         </div>
 
@@ -92,8 +105,9 @@
             >
                 <thead>
                     <tr>
-                        <th class="text-left w-[50%]">THREAD TITLE</th>
-                        <th class="text-center w-[12%]">DATE</th>
+                        <th class="text-left w-[40%]">THREAD TITLE</th>
+                        <th class="text-center w-[10%]">CATEGORY</th>
+                        <th class="text-center w-[10%]">DATE</th>
                         <th class="text-center w-[12%]">LOCATION</th>
                         <th class="text-center w-[8%]">PRICE</th>
                         <th class="text-center w-[15%]">ACTIONS</th>
@@ -101,7 +115,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        v-for="(idea, index) in ideas"
+                        v-for="(idea, index) in filteredIdeas"
                         :key="idea.id"
                         :class="[
                             'hover:bg-yellow-50',
@@ -138,6 +152,14 @@
                                     </div>
                                 </div>
                             </div>
+                        </td>
+                        <td class="text-center align-top">
+                            <span v-if="idea.category" class="text-sm">
+                                {{ getCategoryIcon(idea.category) }}<br />{{
+                                    idea.category
+                                }}
+                            </span>
+                            <span v-else class="text-gray-400">-</span>
                         </td>
                         <td class="text-center align-top">
                             <span v-if="idea.date" class="text-sm">
@@ -180,10 +202,14 @@
                             </div>
                         </td>
                     </tr>
-                    <tr v-if="ideas.length === 0">
-                        <td colspan="5" class="text-center text-gray-500 py-8">
-                            <div class="text-4xl mb-2"></div>
-                            No threads yet!
+                    <tr v-if="filteredIdeas.length === 0">
+                        <td colspan="6" class="text-center text-gray-500 py-8">
+                            <div class="text-4xl mb-2">🔍</div>
+                            {{
+                                selectedCategory
+                                    ? "No threads in this category!"
+                                    : "No threads yet! Start your Tokyo adventure!"
+                            }}
                         </td>
                     </tr>
                 </tbody>
@@ -191,7 +217,11 @@
         </div>
 
         <div class="text-center text-xs sm:text-sm text-forum-dark">
-            Total cool ideas: {{ ideas.length }}
+            {{
+                selectedCategory
+                    ? `Showing ${filteredIdeas.length} of ${ideas.length} ideas`
+                    : `Total cool ideas: ${ideas.length}`
+            }}
         </div>
 
         <IdeaModal
@@ -233,6 +263,7 @@ import LocationSearch from "../components/LocationSearch.vue";
 import IdeaModal from "../components/IdeaModal.vue";
 import IdeaViewModal from "../components/IdeaViewModal.vue";
 import ConfirmationModal from "../components/ConfirmationModal.vue";
+import CategoryDropdown from "../components/CategoryDropdown.vue";
 import { Sprout } from "lucide-vue-next";
 
 export default {
@@ -241,6 +272,7 @@ export default {
         IdeaModal,
         IdeaViewModal,
         ConfirmationModal,
+        CategoryDropdown,
         Sprout,
     },
     data() {
@@ -253,6 +285,18 @@ export default {
             viewingIdea: null,
             showConfirmDelete: false,
             deleteId: null,
+            selectedCategory: "",
+            categoryOptions: [
+                { value: "", label: "🔍 All Categories" },
+                { value: "Museum", label: "🏛️ Museum" },
+                { value: "Trip", label: "🚆 Trip" },
+                { value: "Weird", label: "👽 Weird" },
+                { value: "Activity", label: "⚡ Activity" },
+                { value: "Shop", label: "🛍️ Shop" },
+                { value: "Sight", label: "🗼 Sight" },
+                { value: "Food", label: "🍜 Food" },
+                { value: "Drinks", label: "🍺 Drinks" },
+            ],
             emptyForm: {
                 title: "",
                 description: "",
@@ -262,8 +306,19 @@ export default {
                 longitude: "",
                 url: "",
                 price: "",
+                category: "",
             },
         };
+    },
+    computed: {
+        filteredIdeas() {
+            if (!this.selectedCategory) {
+                return this.ideas;
+            }
+            return this.ideas.filter(
+                (idea) => idea.category === this.selectedCategory,
+            );
+        },
     },
     mounted() {
         this.fetchIdeas();
@@ -361,6 +416,19 @@ export default {
             return description.length > 200
                 ? description.substring(0, 200) + "..."
                 : description;
+        },
+        getCategoryIcon(category) {
+            const icons = {
+                Museum: "🏛️",
+                Trip: "🚆",
+                Weird: "👽",
+                Activity: "⚡",
+                Shop: "🛍️",
+                Sight: "🗼",
+                Food: "🍜",
+                Drinks: "🍺",
+            };
+            return icons[category] || "📌";
         },
     },
 };
