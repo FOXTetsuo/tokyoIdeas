@@ -15,24 +15,24 @@ BLUE = \033[0;34m
 NC = \033[0m # No Color
 
 help: ## Show this help message
-	@echo '$(YELLOW)Tokyo Trip Planner - Docker Commands:$(NC)'
+	@printf "$(YELLOW)Tokyo Trip Planner - Docker Commands:$(NC)\n"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
 
 build: ## Build Docker image
-	@echo "$(YELLOW)Building Docker image...$(NC)"
+	@printf "$(YELLOW)Building Docker image...$(NC)\n"
 	$(DOCKER_COMPOSE) build
-	@echo "$(GREEN)✓ Build complete$(NC)"
+	@printf "$(GREEN)✓ Build complete$(NC)\n"
 
 up: ## Start containers
-	@echo "$(YELLOW)Starting containers...$(NC)"
+	@printf "$(YELLOW)Starting containers...$(NC)\n"
 	$(DOCKER_COMPOSE) up -d
-	@echo "$(GREEN)✓ Containers started$(NC)"
-	@echo "$(BLUE)App running at: http://localhost:8000$(NC)"
+	@printf "$(GREEN)✓ Containers started$(NC)\n"
+	@printf "$(BLUE)App running at: http://localhost:8000$(NC)\n"
 
 down: ## Stop containers
-	@echo "$(YELLOW)Stopping containers...$(NC)"
+	@printf "$(YELLOW)Stopping containers...$(NC)\n"
 	$(DOCKER_COMPOSE) down
-	@echo "$(GREEN)✓ Containers stopped$(NC)"
+	@printf "$(GREEN)✓ Containers stopped$(NC)\n"
 
 restart: down up ## Restart containers
 
@@ -55,28 +55,28 @@ ps: ## Show running containers
 	$(DOCKER_COMPOSE) ps
 
 clean: ## Remove containers and volumes
-	@echo "$(RED)WARNING: This will remove all containers and volumes!$(NC)"
-	@echo "Are you sure? [y/N] "; \
-	@read REPLY; \
+	@printf "$(RED)WARNING: This will remove all containers and volumes!$(NC)\n"
+	@printf "Are you sure? [y/N] \n"; \
+	read REPLY; \
 	if [ "$$REPLY" = "y" ] || [ "$$REPLY" = "Y" ]; then \
 		$(DOCKER_COMPOSE) down -v; \
-		echo "$(GREEN)✓ Cleaned up$(NC)"; \
+		printf "$(GREEN)✓ Cleaned up$(NC)\n"; \
 	fi
 
 rebuild: clean build up ## Clean, rebuild, and start
 
 migrate: ## Run database migrations
-	@echo "$(YELLOW)Running migrations...$(NC)"
+	@printf "$(YELLOW)Running migrations...$(NC)\n"
 	$(DOCKER_COMPOSE) exec app php artisan migrate
-	@echo "$(GREEN)✓ Migrations complete$(NC)"
+	@printf "$(GREEN)✓ Migrations complete$(NC)\n"
 
 migrate-fresh: ## Fresh migration (WARNING: destroys data)
-	@echo "$(RED)WARNING: This will destroy all data!$(NC)"
-	@echo "Are you sure? [y/N] "; \
-	@read REPLY; \
+	@printf "$(RED)WARNING: This will destroy all data!$(NC)\n"
+	@printf "Are you sure? [y/N] \n"; \
+	read REPLY; \
 	if [ "$$REPLY" = "y" ] || [ "$$REPLY" = "Y" ]; then \
 		$(DOCKER_COMPOSE) exec app php artisan migrate:fresh; \
-		echo "$(GREEN)✓ Fresh migration complete$(NC)"; \
+		printf "$(GREEN)✓ Fresh migration complete$(NC)\n"; \
 	fi
 
 seed: ## Seed database
@@ -89,8 +89,8 @@ composer: ## Run composer command (usage: make composer cmd="install")
 	$(DOCKER_COMPOSE) exec app composer $(cmd)
 
 install: build up migrate ## Complete installation
-	@echo "$(GREEN)✓ Installation complete!$(NC)"
-	@echo "$(BLUE)Visit: http://localhost:8000$(NC)"
+	@printf "$(GREEN)✓ Installation complete!$(NC)\n"
+	@printf "$(BLUE)Visit: http://localhost:8000$(NC)\n"
 
 stop: down ## Alias for down
 
@@ -100,12 +100,12 @@ status: ps ## Alias for ps
 
 # Production commands
 prod-build: ## Build production image
-	@echo "$(YELLOW)Building production image...$(NC)"
+	@printf "$(YELLOW)Building production image...$(NC)\n"
 	$(DOCKER) build -t $(APP_NAME):latest .
-	@echo "$(GREEN)✓ Production image built$(NC)"
+	@printf "$(GREEN)✓ Production image built$(NC)\n"
 
 prod-run: ## Run production container (without docker-compose)
-	@echo "$(YELLOW)Starting production container...$(NC)"
+	@printf "$(YELLOW)Starting production container...$(NC)\n"
 	$(DOCKER) run -d \
 --name $(APP_NAME) \
 -p 8000:8000 \
@@ -113,8 +113,8 @@ prod-run: ## Run production container (without docker-compose)
 -e APP_DEBUG=false \
 --restart unless-stopped \
 $(APP_NAME):latest
-	@echo "$(GREEN)✓ Container started$(NC)"
-	@echo "$(BLUE)App running at: http://localhost:8000$(NC)"
+	@printf "$(GREEN)✓ Container started$(NC)\n"
+	@printf "$(BLUE)App running at: http://localhost:8000$(NC)\n"
 
 prod-stop: ## Stop production container
 	$(DOCKER) stop $(APP_NAME)
@@ -125,26 +125,26 @@ prod-logs: ## Show production container logs
 
 # Database backup
 backup: ## Backup database
-	@echo "$(YELLOW)Backing up database...$(NC)"
+	@printf "$(YELLOW)Backing up database...$(NC)\n"
 	@mkdir -p backups
 	$(DOCKER_COMPOSE) exec -T db mysqldump -u tokyo_user -ptokyo_password tokyo_trips > backups/backup-$(shell date +%Y%m%d-%H%M%S).sql
-	@echo "$(GREEN)✓ Backup created in backups/$(NC)"
+	@printf "$(GREEN)✓ Backup created in backups/$(NC)\n"
 
 restore: ## Restore database (usage: make restore file=backup.sql)
-	@echo "$(YELLOW)Restoring database...$(NC)"
+	@printf "$(YELLOW)Restoring database...$(NC)\n"
 	$(DOCKER_COMPOSE) exec -T db mysql -u tokyo_user -ptokyo_password tokyo_trips < $(file)
-	@echo "$(GREEN)✓ Database restored$(NC)"
+	@printf "$(GREEN)✓ Database restored$(NC)\n"
 
 # Maintenance
 optimize: ## Optimize application
 	$(DOCKER_COMPOSE) exec app php artisan config:cache
 	$(DOCKER_COMPOSE) exec app php artisan route:cache
 	$(DOCKER_COMPOSE) exec app php artisan view:cache
-	@echo "$(GREEN)✓ Application optimized$(NC)"
+	@printf "$(GREEN)✓ Application optimized$(NC)\n"
 
 clear-cache: ## Clear all caches
 	$(DOCKER_COMPOSE) exec app php artisan config:clear
 	$(DOCKER_COMPOSE) exec app php artisan route:clear
 	$(DOCKER_COMPOSE) exec app php artisan view:clear
 	$(DOCKER_COMPOSE) exec app php artisan cache:clear
-	@echo "$(GREEN)✓ Caches cleared$(NC)"
+	@printf "$(GREEN)✓ Caches cleared$(NC)\n"
