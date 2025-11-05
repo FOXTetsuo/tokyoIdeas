@@ -15,6 +15,7 @@ class TripIdea extends Model
         "location_name",
         "url",
         "price",
+        "category",
     ];
 
     protected $casts = [

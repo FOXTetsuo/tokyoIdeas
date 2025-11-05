@@ -9,11 +9,6 @@
         </div>
 
         <div class="mt-4 text-center text-xs sm:text-sm text-forum-dark">
-            <img
-                src="data:image/gif;base64,R0lGODlhFAAUAKIAAP///wAAAP8AAP//AAAAAAAAAAAAAAAAACwAAAAAFAAUAAADMzi63P4wyklrC0IJnj8t4bkYpFmVJIqubKu27gvH8kzX9o3n+s73/g8MCofEovGITCoBADs="
-                alt="calendar"
-                class="inline pixelated"
-            />
             Click on events to see details! Click on a date to add new idea!
         </div>
 

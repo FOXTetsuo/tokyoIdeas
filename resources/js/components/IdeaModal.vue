@@ -12,7 +12,7 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
                 class="bg-gradient-to-r from-blue-800 to-blue-600 px-3 py-1 flex justify-between items-center mb-1"
             >
                 <span class="text-white font-bold text-xs sm:text-sm">
-                    {{ editing ? "✏️ EDIT THREAD" : "➕ NEW THREAD" }}
+                    {{ editing ? "EDIT THREAD" : "NEW THREAD" }}
                 </span>
                 <button
                     @click="close"
@@ -69,7 +69,7 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
                         <div>
                             <label
                                 class="block text-xs sm:text-sm font-bold mb-1"
-                                >💴 PRICE ¥ (optional)</label
+                                >PRICE ¥ (optional)</label
                             >
                             <input
                                 v-model="form.price"

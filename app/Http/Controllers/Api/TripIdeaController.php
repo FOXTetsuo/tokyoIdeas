@@ -24,6 +24,7 @@ class TripIdeaController extends Controller
             "location_name" => "nullable|string|max:255",
             "url" => "nullable|url|max:500",
             "price" => "nullable|numeric|min:0",
+            "category" => "nullable|string|max:255",
         ]);
 
         return TripIdea::create($validated);
@@ -45,6 +46,7 @@ class TripIdeaController extends Controller
             "location_name" => "nullable|string|max:255",
             "url" => "nullable|url|max:500",
             "price" => "nullable|numeric|min:0",
+            "category" => "nullable|string|max:255",
         ]);
 
         $tripIdea->update($validated);
