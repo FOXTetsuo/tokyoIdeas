@@ -90,7 +90,11 @@
                         behavior="scroll"
                         class="text-forum-blue font-bold flex-1"
                     >
-                        *** Welcome to Tokyo Trip Ideas! Est. 2025 ***
+                        <transition name="fade" mode="out-in">
+                            <span :key="currentMessageIndex">
+                                {{ currentMarqueeMessage }}
+                            </span>
+                        </transition>
                     </marquee>
                 </div>
             </div>
@@ -103,13 +107,45 @@ export default {
     data() {
         return {
             visitorCount: "000042",
+            marqueeMessages: [
+                "*** Welcome to Tokyo Trip Ideas! ***",
+                "*** Go do some weird shit! ***",
+                "*** Explore Tokyo like never before! ***",
+            ],
+            currentMessageIndex: 0,
         };
+    },
+    computed: {
+        currentMarqueeMessage() {
+            return this.marqueeMessages[this.currentMessageIndex];
+        },
     },
     mounted() {
         setInterval(() => {
             const current = parseInt(this.visitorCount);
             this.visitorCount = String(current + 1).padStart(6, "0");
         }, 5000);
+
+        // Change marquee message periodically (every 10 seconds)
+        setInterval(() => {
+            this.changeMarqueeMessage();
+        }, 10000);
+    },
+    methods: {
+        changeMarqueeMessage() {
+            // Get a random index different from the current one
+            let newIndex;
+            do {
+                newIndex = Math.floor(
+                    Math.random() * this.marqueeMessages.length,
+                );
+            } while (
+                newIndex === this.currentMessageIndex &&
+                this.marqueeMessages.length > 1
+            );
+
+            this.currentMessageIndex = newIndex;
+        },
     },
 };
 </script>
@@ -123,5 +159,20 @@ export default {
 
 marquee {
     animation: none !important;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.8s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
 }
 </style>
