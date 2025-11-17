@@ -32,9 +32,6 @@ RUN composer install --optimize-autoloader --no-dev
 # Install Node dependencies and build assets
 RUN yarn install && yarn build
 
-# Migrate
-RUN php artisan migrate
-
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
