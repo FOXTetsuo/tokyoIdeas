@@ -294,6 +294,7 @@ export default {
             categoryOptions: [
                 { value: "", label: "All Categories" },
                 { value: "Activity", label: "Activity" },
+                { value: "Coffee", label: "Coffee" },
                 { value: "Drinks", label: "Drinks" },
                 { value: "Food", label: "Food" },
                 { value: "Museum", label: "Museum" },

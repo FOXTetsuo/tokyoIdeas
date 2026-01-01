@@ -61,6 +61,7 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
                         >
                             <option value="">-- Select Category --</option>
                             <option value="Activity">Activity</option>
+                            <option value="Coffee">Coffee</option>
                             <option value="Drinks">Drinks</option>
                             <option value="Food">Food</option>
                             <option value="Museum">Museum</option>
