@@ -60,14 +60,16 @@ tokyoIdeas/resources/js/components/IdeaModal.vue
                             class="w-full win95-border-inset px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">-- Select Category --</option>
-                            <option value="Museum">Museum</option>
-                            <option value="Trip">Trip</option>
-                            <option value="Weird">Weird</option>
                             <option value="Activity">Activity</option>
+                            <option value="Drinks">Drinks</option>
+                            <option value="Food">Food</option>
+                            <option value="Museum">Museum</option>
+                            <option value="Nightlife">Nightlife</option>
+                            <option value="Sexy">Sexy</option>
                             <option value="Shop">Shop</option>
                             <option value="Sight">Sight</option>
-                            <option value="Food">Food</option>
-                            <option value="Drinks">Drinks</option>
+                            <option value="Trip">Trip</option>
+                            <option value="Weird">Weird</option>
                         </select>
                     </div>
 
