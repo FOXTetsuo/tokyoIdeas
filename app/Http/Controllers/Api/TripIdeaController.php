@@ -28,10 +28,10 @@ class TripIdeaController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $latestVotersByIdea = $this->latestVotersByTripIdea($ideas->pluck('id')->all());
+        $latestVotesByIdea = $this->latestVotesByTripIdea($ideas->pluck('id')->all());
 
-        return $ideas->map(function (TripIdea $idea) use ($myRatings, $latestVotersByIdea) {
-            return $this->presentIdea($idea, $myRatings, $latestVotersByIdea);
+        return $ideas->map(function (TripIdea $idea) use ($myRatings, $latestVotesByIdea) {
+            return $this->presentIdea($idea, $myRatings, $latestVotesByIdea);
         });
     }
 
@@ -63,9 +63,9 @@ class TripIdeaController extends Controller
             ]);
 
         $myRatings = $this->myRatingsByTripIdea(RaterSession::resolveFromRequest($request));
-        $latestVotersByIdea = $this->latestVotersByTripIdea([$tripIdea->id]);
+        $latestVotesByIdea = $this->latestVotesByTripIdea([$tripIdea->id]);
 
-        return $this->presentIdea($tripIdea, $myRatings, $latestVotersByIdea);
+        return $this->presentIdea($tripIdea, $myRatings, $latestVotesByIdea);
     }
 
     public function update(Request $request, TripIdea $tripIdea)
@@ -108,23 +108,32 @@ class TripIdeaController extends Controller
             ->pluck('rating', 'trip_idea_id');
     }
 
-    private function latestVotersByTripIdea(array $tripIdeaIds): Collection
+    private function latestVotesByTripIdea(array $tripIdeaIds): Collection
     {
         if (empty($tripIdeaIds)) {
             return collect();
         }
 
         return TripIdeaRating::query()
-            ->select(['trip_idea_ratings.trip_idea_id', 'raters.name'])
+            ->select(['trip_idea_ratings.trip_idea_id', 'trip_idea_ratings.rating', 'raters.name'])
             ->join('raters', 'raters.id', '=', 'trip_idea_ratings.rater_id')
             ->whereIn('trip_idea_ratings.trip_idea_id', $tripIdeaIds)
             ->orderBy('trip_idea_ratings.updated_at', 'desc')
             ->get()
             ->groupBy('trip_idea_id')
-            ->map(fn (Collection $rows) => $rows->pluck('name')->take(3)->values()->all());
+            ->map(
+                fn (Collection $rows) => $rows
+                    ->take(3)
+                    ->map(fn ($row) => [
+                        'name' => $row->name,
+                        'rating' => (int) $row->rating,
+                    ])
+                    ->values()
+                    ->all()
+            );
     }
 
-    private function presentIdea(TripIdea $idea, Collection $myRatings, Collection $latestVotersByIdea): array
+    private function presentIdea(TripIdea $idea, Collection $myRatings, Collection $latestVotesByIdea): array
     {
         $payload = $idea->toArray();
         $payload['rating_average'] = $idea->rating_average !== null
@@ -135,7 +144,7 @@ class TripIdeaController extends Controller
         $payload['my_rating'] = $myRatings->has($idea->id)
             ? (int) $myRatings->get($idea->id)
             : null;
-        $payload['latest_voters'] = $latestVotersByIdea->get($idea->id, []);
+        $payload['latest_votes'] = $latestVotesByIdea->get($idea->id, []);
 
         return $payload;
     }

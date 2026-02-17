@@ -37,12 +37,17 @@ class TripIdeaRatingController extends Controller
         $wemustCount = TripIdeaRating::where('trip_idea_id', $tripIdea->id)
             ->where('rating', 3)
             ->count();
-        $latestVoters = TripIdeaRating::query()
+        $latestVotes = TripIdeaRating::query()
+            ->select(['raters.name', 'trip_idea_ratings.rating'])
             ->join('raters', 'raters.id', '=', 'trip_idea_ratings.rater_id')
             ->where('trip_idea_ratings.trip_idea_id', $tripIdea->id)
             ->orderBy('trip_idea_ratings.updated_at', 'desc')
             ->limit(3)
-            ->pluck('raters.name')
+            ->get()
+            ->map(fn ($row) => [
+                'name' => $row->name,
+                'rating' => (int) $row->rating,
+            ])
             ->values()
             ->all();
 
@@ -52,7 +57,7 @@ class TripIdeaRatingController extends Controller
             'rating_average' => $ratingCount > 0 ? round($ratingAverage, 2) : null,
             'rating_count' => (int) $ratingCount,
             'wemust_count' => (int) $wemustCount,
-            'latest_voters' => $latestVoters,
+            'latest_votes' => $latestVotes,
         ]);
     }
 }

@@ -55,12 +55,8 @@
             </div>
         </div>
 
-        <div class="text-[10px] text-gray-600 mt-1">
-            You: {{ myRatingLabel }}
-            <span v-if="hasRatings">
-                | {{ ratingCount }} vote{{ ratingCount === 1 ? "" : "s" }} | Latest:
-                {{ latestVotersLabel }}</span
-            >
+        <div v-if="votesSummary" class="text-[10px] text-gray-600 mt-1">
+            {{ votesSummary }}
         </div>
 
         <p v-if="error" class="text-[10px] text-red-600 mt-1">{{ error }}</p>
@@ -136,32 +132,54 @@ export default {
                 clipPath: `inset(0 ${100 - percent}% 0 0)`,
             };
         },
-        myRatingLabel() {
-            return this.idea.my_rating === null ||
-                this.idea.my_rating === undefined
-                ? "Not rated"
-                : this.labelForRating(Number(this.idea.my_rating));
-        },
-        latestVoters() {
-            if (!Array.isArray(this.idea.latest_voters)) {
+        latestVotes() {
+            if (!Array.isArray(this.idea.latest_votes)) {
                 return [];
             }
 
-            return this.idea.latest_voters
-                .map((name) => (typeof name === "string" ? name.trim() : ""))
-                .filter((name) => name.length > 0)
+            return this.idea.latest_votes
+                .map((vote) => {
+                    const name = typeof vote?.name === "string" ? vote.name.trim() : "";
+                    const rating = Number(vote?.rating);
+
+                    return {
+                        name,
+                        rating,
+                    };
+                })
+                .filter(
+                    (vote) =>
+                        vote.name.length > 0 &&
+                        Number.isInteger(vote.rating) &&
+                        vote.rating >= 0 &&
+                        vote.rating <= 3,
+                )
                 .slice(0, 3);
         },
-        latestVotersLabel() {
-            return this.latestVoters.length > 0
-                ? this.latestVoters.join(", ")
-                : "No votes yet";
+        votesSummary() {
+            if (this.latestVotes.length === 0) {
+                return "";
+            }
+
+            return this.latestVotes
+                .map((vote) => `${vote.name}: ${this.shortLabelForRating(vote.rating)}`)
+                .join(" | ");
         },
     },
     methods: {
         labelForRating(value) {
             const found = this.ratingOptions.find((opt) => opt.value === value);
             return found ? found.label : "Unknown";
+        },
+        shortLabelForRating(value) {
+            const labels = {
+                0: "DON'T LOVE IT",
+                1: "COOL",
+                2: "LOVE",
+                3: "NEED",
+            };
+
+            return labels[value] || "UNKNOWN";
         },
         isSelected(value) {
             if (this.idea.my_rating === null || this.idea.my_rating === undefined) {

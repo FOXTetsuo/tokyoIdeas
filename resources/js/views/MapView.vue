@@ -267,7 +267,7 @@ export default {
                 match.rating_average = payload.rating_average;
                 match.rating_count = payload.rating_count;
                 match.wemust_count = payload.wemust_count;
-                match.latest_voters = payload.latest_voters;
+                match.latest_votes = payload.latest_votes;
             }
 
             if (
@@ -278,7 +278,7 @@ export default {
                 this.viewingIdea.rating_average = payload.rating_average;
                 this.viewingIdea.rating_count = payload.rating_count;
                 this.viewingIdea.wemust_count = payload.wemust_count;
-                this.viewingIdea.latest_voters = payload.latest_voters;
+                this.viewingIdea.latest_votes = payload.latest_votes;
             }
         },
     },
