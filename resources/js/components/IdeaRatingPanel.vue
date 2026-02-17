@@ -36,7 +36,7 @@
                     @click.prevent="setRating(option.value)"
                     :class="[
                         'win95-button text-[10px] leading-none px-0 py-0.5 flex items-center justify-center w-full',
-                        Number(idea.my_rating) === option.value
+                        isSelected(option.value)
                             ? 'win95-border-inset bg-blue-100'
                             : '',
                     ]"
@@ -47,8 +47,7 @@
                 <span
                     class="text-[9px] leading-tight text-center text-gray-700"
                     :class="{
-                        'font-bold text-forum-blue':
-                            Number(idea.my_rating) === option.value,
+                        'font-bold text-forum-blue': isSelected(option.value),
                     }"
                 >
                     {{ option.label }}
@@ -132,7 +131,7 @@ export default {
             return {
                 width: "100%",
                 background:
-                    "linear-gradient(90deg, #1e40af 0%, #0f766e 25%, #84cc16 50%, #dc6b2f 75%, #c2410c 100%)",
+                    "linear-gradient(90deg, #355bcc 0%, #169a90 25%, #9fe024 50%, #ef874e 75%, #dd551c 100%)",
                 clipPath: `inset(0 ${100 - percent}% 0 0)`,
             };
         },
@@ -147,6 +146,13 @@ export default {
         labelForRating(value) {
             const found = this.ratingOptions.find((opt) => opt.value === value);
             return found ? found.label : "Unknown";
+        },
+        isSelected(value) {
+            if (this.idea.my_rating === null || this.idea.my_rating === undefined) {
+                return false;
+            }
+
+            return Number(this.idea.my_rating) === value;
         },
         async setRating(rating) {
             this.error = "";
