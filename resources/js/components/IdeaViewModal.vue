@@ -45,6 +45,8 @@
                         {{ idea.url }}
                     </a>
                 </p>
+
+                <IdeaRatingPanel :idea="idea" @updated="handleRatingUpdated" />
             </div>
             <div class="flex gap-2 justify-end">
                 <button
@@ -70,6 +72,7 @@
 <script>
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import IdeaRatingPanel from "./IdeaRatingPanel.vue";
 
 // Fix for default marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -83,7 +86,9 @@ L.Icon.Default.mergeOptions({
 });
 
 export default {
-    components: {},
+    components: {
+        IdeaRatingPanel,
+    },
     props: {
         idea: {
             type: Object,
@@ -94,7 +99,7 @@ export default {
             default: false,
         },
     },
-    emits: ["close", "edit", "delete"],
+    emits: ["close", "edit", "delete", "rating-updated"],
     data() {
         return {
             smallMap: null,
@@ -141,6 +146,9 @@ export default {
             setTimeout(() => {
                 this.smallMap.invalidateSize();
             }, 100);
+        },
+        handleRatingUpdated(payload) {
+            this.$emit("rating-updated", payload);
         },
     },
 };

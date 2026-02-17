@@ -3,14 +3,29 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Rater;
 use App\Models\TripIdea;
+use App\Models\TripIdeaRating;
+use App\Support\RaterSession;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 
 class TripIdeaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return TripIdea::orderBy("created_at", "desc")->get();
+        $rater = RaterSession::resolveFromRequest($request);
+        $myRatings = $this->myRatingsByTripIdea($rater);
+
+        $ideas = TripIdea::query()
+            ->withAvg("ratings as rating_average", "rating")
+            ->withCount("ratings")
+            ->orderBy("created_at", "desc")
+            ->get();
+
+        return $ideas->map(function (TripIdea $idea) use ($myRatings) {
+            return $this->presentIdea($idea, $myRatings);
+        });
     }
 
     public function store(Request $request)
@@ -30,9 +45,14 @@ class TripIdeaController extends Controller
         return TripIdea::create($validated);
     }
 
-    public function show(TripIdea $tripIdea)
+    public function show(Request $request, TripIdea $tripIdea)
     {
-        return $tripIdea;
+        $tripIdea->loadAvg("ratings as rating_average", "rating")
+            ->loadCount("ratings");
+
+        $myRatings = $this->myRatingsByTripIdea(RaterSession::resolveFromRequest($request));
+
+        return $this->presentIdea($tripIdea, $myRatings);
     }
 
     public function update(Request $request, TripIdea $tripIdea)
@@ -55,11 +75,35 @@ class TripIdeaController extends Controller
 
     public function destroy(TripIdea $tripIdea)
     {
-        if (request()->header("X-Delete-Password") !== "Trustno1") {
+        if (request()->header("X-Delete-Password") !== config("ideas.delete_password")) {
             return response()->json(["error" => "Invalid password"], 403);
         }
 
         $tripIdea->delete();
         return response()->noContent();
+    }
+
+    private function myRatingsByTripIdea(?Rater $rater): Collection
+    {
+        if (!$rater) {
+            return collect();
+        }
+
+        return TripIdeaRating::where("rater_id", $rater->id)
+            ->pluck("rating", "trip_idea_id");
+    }
+
+    private function presentIdea(TripIdea $idea, Collection $myRatings): array
+    {
+        $payload = $idea->toArray();
+        $payload["rating_average"] = $idea->rating_average !== null
+            ? round((float) $idea->rating_average, 2)
+            : null;
+        $payload["rating_count"] = (int) ($idea->ratings_count ?? 0);
+        $payload["my_rating"] = $myRatings->has($idea->id)
+            ? (int) $myRatings->get($idea->id)
+            : null;
+
+        return $payload;
     }
 }

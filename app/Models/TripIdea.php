@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TripIdea extends Model
 {
@@ -24,4 +25,9 @@ class TripIdea extends Model
         "longitude" => "decimal:8",
         "price" => "decimal:2",
     ];
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(TripIdeaRating::class);
+    }
 }

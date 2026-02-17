@@ -26,6 +26,7 @@
             v-model:visible="showViewModal"
             :idea="viewingIdea"
             @close="showViewModal = false"
+            @rating-updated="applyRatingUpdate"
             @edit="editIdea(viewingIdea)"
             @delete="
                 showConfirmDelete = true;
@@ -63,6 +64,8 @@ export default {
             editingIdea: null,
             viewingIdea: null,
             showViewModal: false,
+            showConfirmDelete: false,
+            deleteId: null,
             form: {
                 title: "",
                 description: "",
@@ -164,6 +167,34 @@ export default {
             this.showConfirmDelete = false;
             this.showViewModal = false;
             await this.fetchIdeas();
+        },
+        applyRatingUpdate(payload) {
+            if (
+                this.viewingIdea &&
+                Number(this.viewingIdea.id) === Number(payload.trip_idea_id)
+            ) {
+                this.viewingIdea.my_rating = payload.my_rating;
+                this.viewingIdea.rating_average = payload.rating_average;
+                this.viewingIdea.rating_count = payload.rating_count;
+            }
+
+            this.calendarOptions.events = this.calendarOptions.events.map(
+                (event) => {
+                    if (Number(event.id) !== Number(payload.trip_idea_id)) {
+                        return event;
+                    }
+
+                    return {
+                        ...event,
+                        extendedProps: {
+                            ...event.extendedProps,
+                            my_rating: payload.my_rating,
+                            rating_average: payload.rating_average,
+                            rating_count: payload.rating_count,
+                        },
+                    };
+                },
+            );
         },
         closeModal() {
             this.showModal = false;

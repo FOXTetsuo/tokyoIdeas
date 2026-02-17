@@ -41,6 +41,7 @@
             v-model:visible="showViewModal"
             :idea="viewingIdea"
             @close="showViewModal = false"
+            @rating-updated="applyRatingUpdate"
             @edit="
                 editIdea(viewingIdea);
                 showViewModal = false;
@@ -255,6 +256,26 @@ export default {
                 this.showViewModal = false;
                 this.fetchIdeas();
             });
+        },
+        applyRatingUpdate(payload) {
+            const match = this.ideas.find(
+                (idea) => Number(idea.id) === Number(payload.trip_idea_id),
+            );
+
+            if (match) {
+                match.my_rating = payload.my_rating;
+                match.rating_average = payload.rating_average;
+                match.rating_count = payload.rating_count;
+            }
+
+            if (
+                this.viewingIdea &&
+                Number(this.viewingIdea.id) === Number(payload.trip_idea_id)
+            ) {
+                this.viewingIdea.my_rating = payload.my_rating;
+                this.viewingIdea.rating_average = payload.rating_average;
+                this.viewingIdea.rating_count = payload.rating_count;
+            }
         },
     },
 };

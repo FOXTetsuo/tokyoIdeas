@@ -12,6 +12,11 @@
                     :options="categoryOptions"
                     class="text-sm sm:text-base"
                 />
+                <CategoryDropdown
+                    v-model="selectedSort"
+                    :options="sortOptions"
+                    class="text-sm sm:text-base"
+                />
                 <button
                     @click="openNewModal"
                     class="win95-button text-sm sm:text-base w-full sm:w-auto"
@@ -66,6 +71,8 @@
                         >
                     </div>
                 </div>
+
+                <IdeaRatingPanel :idea="idea" @updated="applyRatingUpdate" />
 
                 <div class="flex gap-1">
                     <button
@@ -155,9 +162,14 @@
                                             :href="idea.url"
                                             target="_blank"
                                             class="text-forum-blue underline"
-                                            >{{ idea.url }}</a
+                                    >{{ idea.url }}</a
                                         >
                                     </div>
+
+                                    <IdeaRatingPanel
+                                        :idea="idea"
+                                        @updated="applyRatingUpdate"
+                                    />
                                 </div>
                             </div>
                         </td>
@@ -243,6 +255,7 @@
             v-model:visible="showViewModal"
             :idea="viewingIdea"
             @close="showViewModal = false"
+            @rating-updated="applyRatingUpdate"
             @edit="
                 editIdea(viewingIdea);
                 showViewModal = false;
@@ -269,6 +282,7 @@ import IdeaModal from "../components/IdeaModal.vue";
 import IdeaViewModal from "../components/IdeaViewModal.vue";
 import ConfirmationModal from "../components/ConfirmationModal.vue";
 import CategoryDropdown from "../components/CategoryDropdown.vue";
+import IdeaRatingPanel from "../components/IdeaRatingPanel.vue";
 import { Sprout } from "lucide-vue-next";
 
 export default {
@@ -278,6 +292,7 @@ export default {
         IdeaViewModal,
         ConfirmationModal,
         CategoryDropdown,
+        IdeaRatingPanel,
         Sprout,
     },
     data() {
@@ -291,6 +306,7 @@ export default {
             showConfirmDelete: false,
             deleteId: null,
             selectedCategory: "",
+            selectedSort: "latest",
             categoryOptions: [
                 { value: "", label: "All Categories" },
                 { value: "Activity", label: "Activity" },
@@ -304,6 +320,10 @@ export default {
                 { value: "Sight", label: "Sight" },
                 { value: "Trip", label: "Trip" },
                 { value: "Weird", label: "Weird" },
+            ],
+            sortOptions: [
+                { value: "latest", label: "Sort: Latest" },
+                { value: "rating", label: "Sort: Highest Rated" },
             ],
             emptyForm: {
                 title: "",
@@ -320,11 +340,39 @@ export default {
     },
     computed: {
         filteredIdeas() {
-            if (!this.selectedCategory) {
-                return this.ideas;
+            const filtered = this.selectedCategory
+                ? this.ideas.filter(
+                      (idea) => idea.category === this.selectedCategory,
+                  )
+                : [...this.ideas];
+
+            if (this.selectedSort === "rating") {
+                return filtered.sort((a, b) => {
+                    const aRated = Number(a.rating_count || 0) > 0;
+                    const bRated = Number(b.rating_count || 0) > 0;
+
+                    if (aRated !== bRated) {
+                        return aRated ? -1 : 1;
+                    }
+
+                    const aAverage = Number(a.rating_average ?? -1);
+                    const bAverage = Number(b.rating_average ?? -1);
+                    if (aAverage !== bAverage) {
+                        return bAverage - aAverage;
+                    }
+
+                    const aCount = Number(a.rating_count || 0);
+                    const bCount = Number(b.rating_count || 0);
+                    if (aCount !== bCount) {
+                        return bCount - aCount;
+                    }
+
+                    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+                });
             }
-            return this.ideas.filter(
-                (idea) => idea.category === this.selectedCategory,
+
+            return filtered.sort(
+                (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
             );
         },
     },
@@ -424,6 +472,26 @@ export default {
             return description.length > 200
                 ? description.substring(0, 200) + "..."
                 : description;
+        },
+        applyRatingUpdate(payload) {
+            const match = this.ideas.find(
+                (idea) => Number(idea.id) === Number(payload.trip_idea_id),
+            );
+
+            if (match) {
+                match.my_rating = payload.my_rating;
+                match.rating_average = payload.rating_average;
+                match.rating_count = payload.rating_count;
+            }
+
+            if (
+                this.viewingIdea &&
+                Number(this.viewingIdea.id) === Number(payload.trip_idea_id)
+            ) {
+                this.viewingIdea.my_rating = payload.my_rating;
+                this.viewingIdea.rating_average = payload.rating_average;
+                this.viewingIdea.rating_count = payload.rating_count;
+            }
         },
     },
 };
