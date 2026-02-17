@@ -10,6 +10,12 @@
                     class="absolute top-0 bottom-0 left-0"
                     :style="fillStyle"
                 ></div>
+                <span
+                    v-if="showWow"
+                    class="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] font-bold text-white tracking-wide"
+                >
+                    WOW!
+                </span>
                 <div
                     v-if="hasRatings"
                     class="absolute top-0 bottom-0 w-[2px] bg-black/60"
@@ -25,8 +31,9 @@
                 class="flex flex-col items-center gap-0.5"
             >
                 <button
+                    type="button"
                     :title="option.label"
-                    @click="setRating(option.value)"
+                    @click.prevent="setRating(option.value)"
                     :class="[
                         'win95-button text-[10px] leading-none px-0 py-0.5 flex items-center justify-center w-full',
                         Number(idea.my_rating) === option.value
@@ -107,6 +114,12 @@ export default {
         hasRatings() {
             return this.ratingCount > 0;
         },
+        wemustCount() {
+            return Number(this.idea.wemust_count || 0);
+        },
+        showWow() {
+            return this.wemustCount > 1;
+        },
         markerLeft() {
             const avg = Number(this.idea.rating_average || 0);
             const percent = Math.max(0, Math.min(100, (avg / 3) * 100));
@@ -119,7 +132,7 @@ export default {
             return {
                 width: "100%",
                 background:
-                    "linear-gradient(90deg, #2563eb 0%, #16a34a 25%, #86efac 50%, #ef4444 75%, #ef4444 100%)",
+                    "linear-gradient(90deg, #1e40af 0%, #0f766e 25%, #84cc16 50%, #dc6b2f 75%, #c2410c 100%)",
                 clipPath: `inset(0 ${100 - percent}% 0 0)`,
             };
         },

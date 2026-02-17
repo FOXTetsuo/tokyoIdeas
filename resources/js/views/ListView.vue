@@ -481,6 +481,7 @@ export default {
                 match.my_rating = payload.my_rating;
                 match.rating_average = payload.rating_average;
                 match.rating_count = payload.rating_count;
+                match.wemust_count = payload.wemust_count;
             }
 
             if (
@@ -490,6 +491,7 @@ export default {
                 this.viewingIdea.my_rating = payload.my_rating;
                 this.viewingIdea.rating_average = payload.rating_average;
                 this.viewingIdea.rating_count = payload.rating_count;
+                this.viewingIdea.wemust_count = payload.wemust_count;
             }
         },
     },

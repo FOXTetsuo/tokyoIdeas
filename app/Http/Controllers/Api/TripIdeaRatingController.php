@@ -34,12 +34,16 @@ class TripIdeaRatingController extends Controller
 
         $ratingAverage = (float) TripIdeaRating::where("trip_idea_id", $tripIdea->id)->avg("rating");
         $ratingCount = TripIdeaRating::where("trip_idea_id", $tripIdea->id)->count();
+        $wemustCount = TripIdeaRating::where("trip_idea_id", $tripIdea->id)
+            ->where("rating", 3)
+            ->count();
 
         return response()->json([
             "trip_idea_id" => $tripIdea->id,
             "my_rating" => (int) $validated["rating"],
             "rating_average" => $ratingCount > 0 ? round($ratingAverage, 2) : null,
             "rating_count" => (int) $ratingCount,
+            "wemust_count" => (int) $wemustCount,
         ]);
     }
 }

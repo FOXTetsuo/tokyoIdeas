@@ -20,6 +20,11 @@ class TripIdeaController extends Controller
         $ideas = TripIdea::query()
             ->withAvg("ratings as rating_average", "rating")
             ->withCount("ratings")
+            ->withCount([
+                "ratings as wemust_count" => function ($query) {
+                    $query->where("rating", 3);
+                },
+            ])
             ->orderBy("created_at", "desc")
             ->get();
 
@@ -48,7 +53,12 @@ class TripIdeaController extends Controller
     public function show(Request $request, TripIdea $tripIdea)
     {
         $tripIdea->loadAvg("ratings as rating_average", "rating")
-            ->loadCount("ratings");
+            ->loadCount("ratings")
+            ->loadCount([
+                "ratings as wemust_count" => function ($query) {
+                    $query->where("rating", 3);
+                },
+            ]);
 
         $myRatings = $this->myRatingsByTripIdea(RaterSession::resolveFromRequest($request));
 
@@ -100,6 +110,7 @@ class TripIdeaController extends Controller
             ? round((float) $idea->rating_average, 2)
             : null;
         $payload["rating_count"] = (int) ($idea->ratings_count ?? 0);
+        $payload["wemust_count"] = (int) ($idea->wemust_count ?? 0);
         $payload["my_rating"] = $myRatings->has($idea->id)
             ? (int) $myRatings->get($idea->id)
             : null;

@@ -176,6 +176,7 @@ export default {
                 this.viewingIdea.my_rating = payload.my_rating;
                 this.viewingIdea.rating_average = payload.rating_average;
                 this.viewingIdea.rating_count = payload.rating_count;
+                this.viewingIdea.wemust_count = payload.wemust_count;
             }
 
             this.calendarOptions.events = this.calendarOptions.events.map(
@@ -191,6 +192,7 @@ export default {
                             my_rating: payload.my_rating,
                             rating_average: payload.rating_average,
                             rating_count: payload.rating_count,
+                            wemust_count: payload.wemust_count,
                         },
                     };
                 },

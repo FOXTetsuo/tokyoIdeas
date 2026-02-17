@@ -9,8 +9,8 @@
                 First rating setup
             </p>
             <p class="mb-4 text-xs text-center text-gray-600">
-                Enter your name and delete password once. We keep you signed in for
-                1 week.
+                Enter your name and the secret password once. We keep you signed
+                in for 1 week.
             </p>
 
             <input
@@ -24,7 +24,7 @@
             <input
                 v-model="localPassword"
                 type="password"
-                placeholder="Delete password"
+                placeholder="Password"
                 class="win95-button w-full mb-3"
                 @keyup.enter="handleConfirm"
             />
@@ -39,7 +39,9 @@
                 >
                     {{ loading ? "Saving..." : "Save" }}
                 </button>
-                <button @click="handleCancel" class="win95-button">Cancel</button>
+                <button @click="handleCancel" class="win95-button">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
