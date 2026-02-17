@@ -72,8 +72,6 @@
                     </div>
                 </div>
 
-                <IdeaRatingPanel :idea="idea" @updated="applyRatingUpdate" />
-
                 <div class="flex gap-1">
                     <button
                         @click="viewIdea(idea)"
@@ -94,6 +92,8 @@
                         DELETE
                     </button>
                 </div>
+
+                <IdeaRatingPanel :idea="idea" @updated="applyRatingUpdate" />
             </div>
 
             <div
@@ -165,11 +165,6 @@
                                     >{{ idea.url }}</a
                                         >
                                     </div>
-
-                                    <IdeaRatingPanel
-                                        :idea="idea"
-                                        @updated="applyRatingUpdate"
-                                    />
                                 </div>
                             </div>
                         </td>
@@ -198,7 +193,7 @@
                             <span v-else class="text-gray-400">-</span>
                         </td>
                         <td class="align-middle">
-                            <div class="flex gap-1 justify-center mr-1">
+                            <div class="flex gap-1 justify-center mr-1 mb-1">
                                 <button
                                     @click="viewIdea(idea)"
                                     class="win95-button text-xs flex-1 bg-blue-500 hover:bg-blue-600 text-white"
@@ -218,6 +213,10 @@
                                     DELETE
                                 </button>
                             </div>
+                            <IdeaRatingPanel
+                                :idea="idea"
+                                @updated="applyRatingUpdate"
+                            />
                         </td>
                     </tr>
                     <tr v-if="filteredIdeas.length === 0">
