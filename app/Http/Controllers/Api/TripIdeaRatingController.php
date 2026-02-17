@@ -14,36 +14,45 @@ class TripIdeaRatingController extends Controller
     {
         $rater = RaterSession::resolveFromRequest($request);
 
-        if (!$rater) {
-            return response()->json(["error" => "Missing rating session"], 401);
+        if (! $rater) {
+            return response()->json(['error' => 'Missing rating session'], 401);
         }
 
         $validated = $request->validate([
-            "rating" => "required|integer|min:0|max:3",
+            'rating' => 'required|integer|min:0|max:3',
         ]);
 
         TripIdeaRating::updateOrCreate(
             [
-                "trip_idea_id" => $tripIdea->id,
-                "rater_id" => $rater->id,
+                'trip_idea_id' => $tripIdea->id,
+                'rater_id' => $rater->id,
             ],
             [
-                "rating" => $validated["rating"],
+                'rating' => $validated['rating'],
             ],
         );
 
-        $ratingAverage = (float) TripIdeaRating::where("trip_idea_id", $tripIdea->id)->avg("rating");
-        $ratingCount = TripIdeaRating::where("trip_idea_id", $tripIdea->id)->count();
-        $wemustCount = TripIdeaRating::where("trip_idea_id", $tripIdea->id)
-            ->where("rating", 3)
+        $ratingAverage = (float) TripIdeaRating::where('trip_idea_id', $tripIdea->id)->avg('rating');
+        $ratingCount = TripIdeaRating::where('trip_idea_id', $tripIdea->id)->count();
+        $wemustCount = TripIdeaRating::where('trip_idea_id', $tripIdea->id)
+            ->where('rating', 3)
             ->count();
+        $latestVoters = TripIdeaRating::query()
+            ->join('raters', 'raters.id', '=', 'trip_idea_ratings.rater_id')
+            ->where('trip_idea_ratings.trip_idea_id', $tripIdea->id)
+            ->orderBy('trip_idea_ratings.updated_at', 'desc')
+            ->limit(3)
+            ->pluck('raters.name')
+            ->values()
+            ->all();
 
         return response()->json([
-            "trip_idea_id" => $tripIdea->id,
-            "my_rating" => (int) $validated["rating"],
-            "rating_average" => $ratingCount > 0 ? round($ratingAverage, 2) : null,
-            "rating_count" => (int) $ratingCount,
-            "wemust_count" => (int) $wemustCount,
+            'trip_idea_id' => $tripIdea->id,
+            'my_rating' => (int) $validated['rating'],
+            'rating_average' => $ratingCount > 0 ? round($ratingAverage, 2) : null,
+            'rating_count' => (int) $ratingCount,
+            'wemust_count' => (int) $wemustCount,
+            'latest_voters' => $latestVoters,
         ]);
     }
 }

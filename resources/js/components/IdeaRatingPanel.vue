@@ -58,7 +58,8 @@
         <div class="text-[10px] text-gray-600 mt-1">
             You: {{ myRatingLabel }}
             <span v-if="hasRatings">
-                | {{ ratingCount }} vote{{ ratingCount === 1 ? "" : "s" }}</span
+                | {{ ratingCount }} vote{{ ratingCount === 1 ? "" : "s" }} | Latest:
+                {{ latestVotersLabel }}</span
             >
         </div>
 
@@ -140,6 +141,21 @@ export default {
                 this.idea.my_rating === undefined
                 ? "Not rated"
                 : this.labelForRating(Number(this.idea.my_rating));
+        },
+        latestVoters() {
+            if (!Array.isArray(this.idea.latest_voters)) {
+                return [];
+            }
+
+            return this.idea.latest_voters
+                .map((name) => (typeof name === "string" ? name.trim() : ""))
+                .filter((name) => name.length > 0)
+                .slice(0, 3);
+        },
+        latestVotersLabel() {
+            return this.latestVoters.length > 0
+                ? this.latestVoters.join(", ")
+                : "No votes yet";
         },
     },
     methods: {

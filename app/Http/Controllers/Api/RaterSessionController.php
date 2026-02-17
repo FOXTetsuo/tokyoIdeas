@@ -11,20 +11,24 @@ class RaterSessionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            "name" => "required|string|max:50",
-            "password" => "required|string",
+            'name' => 'required|string|max:50',
+            'password' => 'required|string',
         ]);
 
-        if ($validated["password"] !== config("ideas.delete_password")) {
-            return response()->json(["error" => "Invalid password"], 403);
+        if ($validated['password'] !== config('ideas.delete_password')) {
+            return response()->json(['error' => 'Invalid password'], 403);
         }
 
-        [$rater, $token] = RaterSession::issue($validated["name"]);
+        if (trim($validated['name']) === '') {
+            return response()->json(['error' => 'Name is required'], 422);
+        }
+
+        [$rater, $token] = RaterSession::issue($validated['name']);
 
         return response()
             ->json([
-                "name" => $rater->name,
-                "message" => "Rating session created",
+                'name' => $rater->name,
+                'message' => 'Rating session created',
             ])
             ->cookie(RaterSession::cookie($token));
     }
