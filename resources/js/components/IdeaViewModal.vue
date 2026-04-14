@@ -50,16 +50,17 @@
             </div>
             <div class="flex gap-2 justify-end">
                 <button
+                    v-if="showEditButton"
                     @click="$emit('edit')"
                     class="win95-button bg-green-500 text-white hover:bg-green-600"
                 >
-                    Edit
+                    {{ editLabel }}
                 </button>
                 <button
                     @click="$emit('delete')"
                     class="win95-button bg-red-500 text-white hover:bg-red-600"
                 >
-                    Delete
+                    {{ deleteLabel }}
                 </button>
                 <button @click="$emit('close')" class="win95-button">
                     Close
@@ -97,6 +98,18 @@ export default {
         visible: {
             type: Boolean,
             default: false,
+        },
+        showEditButton: {
+            type: Boolean,
+            default: true,
+        },
+        editLabel: {
+            type: String,
+            default: "Edit",
+        },
+        deleteLabel: {
+            type: String,
+            default: "Archive",
         },
     },
     emits: ["close", "edit", "delete", "rating-updated"],

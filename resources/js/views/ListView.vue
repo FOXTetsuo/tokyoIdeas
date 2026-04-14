@@ -4,7 +4,7 @@
             class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4"
         >
             <h2 class="text-xl sm:text-2xl font-bold text-forum-blue">
-                <span class="animate-pulse">►</span> All Threads
+                <span class="animate-pulse">►</span> Threads
             </h2>
             <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <CategoryDropdown
@@ -26,10 +26,16 @@
             </div>
         </div>
 
-        <!-- Mobile Card View -->
-        <div class="sm:hidden space-y-2">
+        <button
+            @click="showAllThreads = !showAllThreads"
+            class="win95-button w-full text-left mb-2"
+        >
+            {{ showAllThreads ? "▼" : "►" }} All Threads
+        </button>
+
+        <div v-if="showAllThreads" class="sm:hidden space-y-2 mb-4">
             <div
-                v-for="(idea, index) in filteredIdeas"
+                v-for="(idea, index) in filteredActiveIdeas"
                 :key="idea.id"
                 :class="[
                     'win95-border p-3',
@@ -86,10 +92,10 @@
                         Edit
                     </button>
                     <button
-                        @click="deleteIdea(idea.id)"
+                        @click="archiveIdea(idea.id)"
                         class="win95-button text-xs flex-1"
                     >
-                        DELETE
+                        ARCHIVE
                     </button>
                 </div>
 
@@ -97,7 +103,7 @@
             </div>
 
             <div
-                v-if="filteredIdeas.length === 0"
+                v-if="filteredActiveIdeas.length === 0"
                 class="win95-border bg-white p-8 text-center text-gray-500"
             >
                 {{
@@ -108,8 +114,8 @@
             </div>
         </div>
 
-        <!-- Desktop Table View -->
         <div
+            v-if="showAllThreads"
             class="hidden sm:block win95-border-inset bg-white p-4 mb-4 overflow-x-auto"
         >
             <table
@@ -130,7 +136,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        v-for="(idea, index) in filteredIdeas"
+                        v-for="(idea, index) in filteredActiveIdeas"
                         :key="idea.id"
                         :class="[
                             'hover:bg-yellow-50',
@@ -207,10 +213,10 @@
                                     EDIT
                                 </button>
                                 <button
-                                    @click="deleteIdea(idea.id)"
+                                    @click="archiveIdea(idea.id)"
                                     class="win95-button text-xs flex-1 bg-red-500 hover:bg-red-600 text-white"
                                 >
-                                    DELETE
+                                    ARCHIVE
                                 </button>
                             </div>
                             <IdeaRatingPanel
@@ -219,7 +225,7 @@
                             />
                         </td>
                     </tr>
-                    <tr v-if="filteredIdeas.length === 0">
+                    <tr v-if="filteredActiveIdeas.length === 0">
                         <td colspan="6" class="text-center text-gray-500 py-8">
                             {{
                                 selectedCategory
@@ -232,12 +238,157 @@
             </table>
         </div>
 
+        <button
+            @click="showArchivedThreads = !showArchivedThreads"
+            class="win95-button w-full text-left mb-2"
+        >
+            {{ showArchivedThreads ? "▼" : "►" }} Archived Threads
+        </button>
+
+        <div v-if="showArchivedThreads" class="sm:hidden space-y-2 mb-4">
+            <div
+                v-for="(idea, index) in filteredArchivedIdeas"
+                :key="idea.id"
+                :class="[
+                    'win95-border p-3',
+                    index % 2 === 0 ? 'bg-gray-100' : 'bg-slate-100',
+                ]"
+            >
+                <div class="flex items-start gap-2 mb-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-forum-blue break-words">
+                            {{ idea.title }}
+                        </div>
+                        <div
+                            v-if="idea.description"
+                            class="text-sm text-gray-600 mt-1 break-words"
+                        >
+                            {{ formatDescription(idea.description) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-gray-600 space-y-1 mb-2">
+                    <div v-if="idea.category">{{ idea.category }}</div>
+                    <div v-if="idea.date">📅 {{ formatDate(idea.date) }}</div>
+                    <div v-if="idea.location_name">📍 {{ idea.location_name }}</div>
+                </div>
+
+                <div class="flex gap-1">
+                    <button
+                        @click="viewIdea(idea, true)"
+                        class="win95-button text-xs flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                        View
+                    </button>
+                    <button
+                        @click="promptDeleteArchivedIdea(idea.id)"
+                        class="win95-button text-xs flex-1 bg-red-500 hover:bg-red-600 text-white"
+                    >
+                        DELETE
+                    </button>
+                </div>
+
+                <IdeaRatingPanel :idea="idea" @updated="applyRatingUpdate" />
+            </div>
+
+            <div
+                v-if="filteredArchivedIdeas.length === 0"
+                class="win95-border bg-white p-8 text-center text-gray-500"
+            >
+                No archived threads yet.
+            </div>
+        </div>
+
+        <div
+            v-if="showArchivedThreads"
+            class="hidden sm:block win95-border-inset bg-white p-4 mb-4 overflow-x-auto"
+        >
+            <table
+                class="w-full border-separate border-spacing-y-1"
+                style="min-width: 800px"
+            >
+                <thead>
+                    <tr>
+                        <th class="text-left" style="width: 35%">THREAD TITLE</th>
+                        <th class="text-center" style="width: 10%">CATEGORY</th>
+                        <th class="text-center" style="width: 12%">DATE</th>
+                        <th class="text-center" style="width: 13%">LOCATION</th>
+                        <th class="text-center" style="width: 10%">PRICE</th>
+                        <th class="text-center" style="width: 20%">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="(idea, index) in filteredArchivedIdeas"
+                        :key="idea.id"
+                        :class="[
+                            'hover:bg-gray-200',
+                            index % 2 === 0 ? 'bg-gray-100' : 'bg-slate-100',
+                        ]"
+                    >
+                        <td class="break-all align-top">
+                            <div class="min-w-0">
+                                <div class="font-bold text-forum-blue break-all">
+                                    {{ idea.title }}
+                                </div>
+                                <div
+                                    v-if="idea.description"
+                                    class="text-sm text-gray-600 mt-1 break-all"
+                                >
+                                    {{ formatDescription(idea.description) }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center align-top">
+                            <span v-if="idea.category" class="text-sm">{{ idea.category }}</span>
+                            <span v-else class="text-gray-400">-</span>
+                        </td>
+                        <td class="text-center align-top">
+                            <span v-if="idea.date" class="text-sm">{{ formatDate(idea.date) }}</span>
+                            <span v-else class="text-gray-400">-</span>
+                        </td>
+                        <td class="text-center align-top">
+                            <span v-if="idea.location_name" class="text-sm">{{ idea.location_name }}</span>
+                            <span v-else class="text-gray-400">-</span>
+                        </td>
+                        <td class="text-center align-top">
+                            <span v-if="idea.price" class="text-sm">¥{{ formatPrice(idea.price) }}</span>
+                            <span v-else class="text-gray-400">-</span>
+                        </td>
+                        <td class="align-middle">
+                            <div class="flex gap-1 justify-center mr-1 mb-1">
+                                <button
+                                    @click="viewIdea(idea, true)"
+                                    class="win95-button text-xs flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                                >
+                                    VIEW
+                                </button>
+                                <button
+                                    @click="promptDeleteArchivedIdea(idea.id)"
+                                    class="win95-button text-xs flex-1 bg-red-500 hover:bg-red-600 text-white"
+                                >
+                                    DELETE
+                                </button>
+                            </div>
+                            <IdeaRatingPanel
+                                :idea="idea"
+                                @updated="applyRatingUpdate"
+                            />
+                        </td>
+                    </tr>
+                    <tr v-if="filteredArchivedIdeas.length === 0">
+                        <td colspan="6" class="text-center text-gray-500 py-8">
+                            No archived threads yet.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <div class="text-center text-xs sm:text-sm text-forum-dark">
-            {{
-                selectedCategory
-                    ? `Showing ${filteredIdeas.length} of ${ideas.length} ideas`
-                    : `Total cool ideas: ${ideas.length}`
-            }}
+            Active: {{ filteredActiveIdeas.length }} / {{ activeIdeas.length }} |
+            Archived: {{ filteredArchivedIdeas.length }} / {{ archivedIdeas.length }}
         </div>
 
         <IdeaModal
@@ -253,22 +404,20 @@
         <IdeaViewModal
             v-model:visible="showViewModal"
             :idea="viewingIdea"
+            :show-edit-button="!viewingArchivedIdea"
+            :delete-label="viewingArchivedIdea ? 'Delete' : 'Archive'"
             @close="showViewModal = false"
             @rating-updated="applyRatingUpdate"
             @edit="
                 editIdea(viewingIdea);
                 showViewModal = false;
             "
-            @delete="
-                showConfirmDelete = true;
-                deleteId = viewingIdea.id;
-                showViewModal = false;
-            "
+            @delete="handleViewDelete"
         />
 
         <ConfirmationModal
             v-model:visible="showConfirmDelete"
-            message="🗑️ Delete this idea? This cannot be undone!"
+            message="🗑️ Permanently delete this archived thread? This cannot be undone!"
             @confirm="confirmDelete($event)"
             @cancel="showConfirmDelete = false"
         />
@@ -296,14 +445,18 @@ export default {
     },
     data() {
         return {
-            ideas: [],
+            activeIdeas: [],
+            archivedIdeas: [],
             showModal: false,
             editingIdea: null,
             locationData: null,
             showViewModal: false,
             viewingIdea: null,
+            viewingArchivedIdea: false,
             showConfirmDelete: false,
             deleteId: null,
+            showAllThreads: true,
+            showArchivedThreads: true,
             selectedCategory: "",
             selectedSort: "latest",
             categoryOptions: [
@@ -338,15 +491,36 @@ export default {
         };
     },
     computed: {
-        filteredIdeas() {
-            const filtered = this.selectedCategory
-                ? this.ideas.filter(
-                      (idea) => idea.category === this.selectedCategory,
-                  )
-                : [...this.ideas];
+        filteredActiveIdeas() {
+            return this.sortIdeas(this.filterByCategory(this.activeIdeas));
+        },
+        filteredArchivedIdeas() {
+            return this.sortIdeas(this.filterByCategory(this.archivedIdeas));
+        },
+    },
+    mounted() {
+        this.fetchIdeas();
+    },
+    watch: {
+        showModal(newVal) {
+            if (!newVal) {
+                this.closeModal();
+            }
+        },
+    },
+    methods: {
+        filterByCategory(ideas) {
+            if (!this.selectedCategory) {
+                return [...ideas];
+            }
+
+            return ideas.filter((idea) => idea.category === this.selectedCategory);
+        },
+        sortIdeas(ideas) {
+            const sortedIdeas = [...ideas];
 
             if (this.selectedSort === "rating") {
-                return filtered.sort((a, b) => {
+                return sortedIdeas.sort((a, b) => {
                     const aRated = Number(a.rating_count || 0) > 0;
                     const bRated = Number(b.rating_count || 0) > 0;
 
@@ -370,25 +544,17 @@ export default {
                 });
             }
 
-            return filtered.sort(
+            return sortedIdeas.sort(
                 (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
             );
         },
-    },
-    mounted() {
-        this.fetchIdeas();
-    },
-    watch: {
-        showModal(newVal) {
-            if (!newVal) {
-                this.closeModal();
-            }
-        },
-    },
-    methods: {
         async fetchIdeas() {
-            const response = await fetch("/api/trip-ideas");
-            this.ideas = await response.json();
+            const [activeResponse, archivedResponse] = await Promise.all([
+                fetch("/api/trip-ideas"),
+                fetch("/api/trip-ideas?archived=1"),
+            ]);
+            this.activeIdeas = await activeResponse.json();
+            this.archivedIdeas = await archivedResponse.json();
         },
         openNewModal() {
             this.editingIdea = null;
@@ -425,17 +591,43 @@ export default {
             this.closeModal();
             this.fetchIdeas();
         },
-        viewIdea(idea) {
+        viewIdea(idea, archived = false) {
             this.viewingIdea = idea;
+            this.viewingArchivedIdea = archived;
             this.showViewModal = true;
         },
         editIdea(idea) {
             this.editingIdea = idea;
             this.showModal = true;
         },
-        deleteIdea(id) {
+        async archiveIdea(id) {
+            await fetch(`/api/trip-ideas/${id}/archive`, {
+                method: "PATCH",
+                headers: {
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+
+            this.showViewModal = false;
+            await this.fetchIdeas();
+        },
+        promptDeleteArchivedIdea(id) {
             this.showConfirmDelete = true;
             this.deleteId = id;
+        },
+        handleViewDelete() {
+            if (!this.viewingIdea) {
+                return;
+            }
+
+            if (this.viewingArchivedIdea) {
+                this.showViewModal = false;
+                this.promptDeleteArchivedIdea(this.viewingIdea.id);
+                return;
+            }
+
+            this.archiveIdea(this.viewingIdea.id);
         },
         async confirmDelete(password) {
             await fetch(`/api/trip-ideas/${this.deleteId}`, {
@@ -447,7 +639,8 @@ export default {
                 },
             });
             this.showConfirmDelete = false;
-            this.fetchIdeas();
+            this.deleteId = null;
+            await this.fetchIdeas();
         },
 
         closeModal() {
@@ -473,7 +666,7 @@ export default {
                 : description;
         },
         applyRatingUpdate(payload) {
-            const match = this.ideas.find(
+            const match = [...this.activeIdeas, ...this.archivedIdeas].find(
                 (idea) => Number(idea.id) === Number(payload.trip_idea_id),
             );
 

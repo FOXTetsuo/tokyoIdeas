@@ -40,23 +40,14 @@
         <IdeaViewModal
             v-model:visible="showViewModal"
             :idea="viewingIdea"
+            delete-label="Archive"
             @close="showViewModal = false"
             @rating-updated="applyRatingUpdate"
             @edit="
                 editIdea(viewingIdea);
                 showViewModal = false;
             "
-            @delete="
-                showConfirmDelete = true;
-                deleteId = viewingIdea.id;
-            "
-        />
-
-        <ConfirmationModal
-            v-model:visible="showConfirmDelete"
-            message="🗑️ Delete this idea? This cannot be undone!"
-            @confirm="confirmDelete($event)"
-            @cancel="showConfirmDelete = false"
+            @delete="archiveIdea(viewingIdea.id)"
         />
 
         <div class="win95-border-inset">
@@ -76,7 +67,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import IdeaModal from "../components/IdeaModal.vue";
 import IdeaViewModal from "../components/IdeaViewModal.vue";
-import ConfirmationModal from "../components/ConfirmationModal.vue";
 
 // Fix for default marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -93,7 +83,6 @@ export default {
     components: {
         IdeaModal,
         IdeaViewModal,
-        ConfirmationModal,
     },
     data() {
         return {
@@ -105,8 +94,6 @@ export default {
             editingIdea: null,
             showViewModal: false,
             viewingIdea: null,
-            showConfirmDelete: false,
-            deleteId: null,
             form: {
                 title: "",
                 description: "",
@@ -243,16 +230,14 @@ export default {
             this.editingIdea = idea;
             this.showModal = true;
         },
-        confirmDelete(password) {
-            fetch(`/api/trip-ideas/${this.deleteId}`, {
-                method: "DELETE",
+        archiveIdea(id) {
+            fetch(`/api/trip-ideas/${id}/archive`, {
+                method: "PATCH",
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    "X-Delete-Password": password,
                 },
             }).then(() => {
-                this.showConfirmDelete = false;
                 this.showViewModal = false;
                 this.fetchIdeas();
             });

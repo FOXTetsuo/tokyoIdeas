@@ -25,20 +25,11 @@
         <IdeaViewModal
             v-model:visible="showViewModal"
             :idea="viewingIdea"
+            delete-label="Archive"
             @close="showViewModal = false"
             @rating-updated="applyRatingUpdate"
             @edit="editIdea(viewingIdea)"
-            @delete="
-                showConfirmDelete = true;
-                deleteId = viewingIdea.id;
-            "
-        />
-
-        <ConfirmationModal
-            v-model:visible="showConfirmDelete"
-            message="🗑️ Delete this idea? This cannot be undone!"
-            @confirm="confirmDelete($event)"
-            @cancel="showConfirmDelete = false"
+            @delete="archiveIdea(viewingIdea.id)"
         />
     </div>
 </template>
@@ -49,14 +40,12 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import IdeaModal from "../components/IdeaModal.vue";
 import IdeaViewModal from "../components/IdeaViewModal.vue";
-import ConfirmationModal from "../components/ConfirmationModal.vue";
 
 export default {
     components: {
         FullCalendar,
         IdeaModal,
         IdeaViewModal,
-        ConfirmationModal,
     },
     data() {
         return {
@@ -64,8 +53,6 @@ export default {
             editingIdea: null,
             viewingIdea: null,
             showViewModal: false,
-            showConfirmDelete: false,
-            deleteId: null,
             form: {
                 title: "",
                 description: "",
@@ -155,16 +142,14 @@ export default {
             this.showModal = true;
             this.showViewModal = false;
         },
-        async confirmDelete(password) {
-            await fetch(`/api/trip-ideas/${this.deleteId}`, {
-                method: "DELETE",
+        async archiveIdea(id) {
+            await fetch(`/api/trip-ideas/${id}/archive`, {
+                method: "PATCH",
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    "X-Delete-Password": password,
                 },
             });
-            this.showConfirmDelete = false;
             this.showViewModal = false;
             await this.fetchIdeas();
         },

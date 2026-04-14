@@ -8,22 +8,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TripIdea extends Model
 {
     protected $fillable = [
-        "title",
-        "description",
-        "date",
-        "latitude",
-        "longitude",
-        "location_name",
-        "url",
-        "price",
-        "category",
+        'title',
+        'description',
+        'date',
+        'latitude',
+        'longitude',
+        'location_name',
+        'url',
+        'price',
+        'category',
     ];
 
     protected $casts = [
-        "date" => "date",
-        "latitude" => "decimal:8",
-        "longitude" => "decimal:8",
-        "price" => "decimal:2",
+        'date' => 'date',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
+        'price' => 'decimal:2',
+        'archived_at' => 'datetime',
     ];
 
     public function ratings(): HasMany

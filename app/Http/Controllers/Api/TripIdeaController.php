@@ -17,6 +17,8 @@ class TripIdeaController extends Controller
         $rater = RaterSession::resolveFromRequest($request);
         $myRatings = $this->myRatingsByTripIdea($rater);
 
+        $archivedOnly = $request->boolean('archived');
+
         $ideas = TripIdea::query()
             ->withAvg('ratings as rating_average', 'rating')
             ->withCount('ratings')
@@ -25,6 +27,11 @@ class TripIdeaController extends Controller
                     $query->where('rating', 3);
                 },
             ])
+            ->when(
+                $archivedOnly,
+                fn ($query) => $query->whereNotNull('archived_at'),
+                fn ($query) => $query->whereNull('archived_at')
+            )
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -94,6 +101,14 @@ class TripIdeaController extends Controller
         }
 
         $tripIdea->delete();
+
+        return response()->noContent();
+    }
+
+    public function archive(TripIdea $tripIdea)
+    {
+        $tripIdea->archived_at = now();
+        $tripIdea->save();
 
         return response()->noContent();
     }
